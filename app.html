@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NEXORA</title>
+  <link rel="icon" href="/img/logo.svg"/>
+  <link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body>
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- Overlay sidebar (móvil) -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <img src="/img/logo.svg" alt="NEXORA"/>
+    <div class="sidebar-logo-text">
+      <div class="brand">NEXORA</div>
+      <div class="sub">Control de Asistencia</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+    <button class="nav-link active" data-module="dashboard">
+      <span class="icon">📊</span> Dashboard
+    </button>
+    <button class="nav-link" data-module="attendance">
+      <span class="icon">📍</span> Asistencia
+    </button>
+    <button class="nav-link" data-module="reimbursements">
+      <span class="icon">💳</span> Reembolsos
+    </button>
+    <button class="nav-link" data-module="documents">
+      <span class="icon">📂</span> Documentos
+    </button>
+
+    <div class="nav-section-label admin-only">Administración</div>
+    <button class="nav-link admin-only" data-module="workers">
+      <span class="icon">👥</span> Trabajadores
+    </button>
+    <button class="nav-link admin-only" data-module="reports">
+      <span class="icon">📈</span> Reportes
+    </button>
+    <button class="nav-link admin-only" data-module="config">
+      <span class="icon">⚙️</span> Configuración
+    </button>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar" id="sidebarAvatar">W</div>
+      <div class="user-info">
+        <div class="user-name" id="sidebarName">Usuario</div>
+        <div class="user-role" id="sidebarRole">Cargando...</div>
+      </div>
+    </div>
+    <button class="theme-toggle-btn" id="themeToggle">
+      <span id="themeIcon">🌙</span> <span id="themeLabel">Modo oscuro</span>
+    </button>
+    <button class="logout-btn" style="background:var(--bg-secondary);color:var(--text-primary);margin-bottom:4px" onclick="openModal('modalChangePassword')">
+      🔑 Cambiar contraseña
+    </button>
+    <button class="logout-btn" id="logoutBtn">
+      🚪 Cerrar sesión
+    </button>
+  </div>
+</aside>
+
+<!-- ══ TOPBAR MÓVIL ══════════════════════════════════════════ -->
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="hamburger" id="hamburger">☰</button>
+    <span class="topbar-logo">NEXORA</span>
+  </div>
+  <div class="topbar-right">
+    <button class="icon-btn" id="topbarTheme">🌙</button>
+  </div>
+</div>
+
+<!-- ══ CONTENIDO PRINCIPAL ══════════════════════════════════ -->
+<div class="main-content">
+
+  <!-- ── DASHBOARD ── -->
+  <section id="module-dashboard" class="module-section active">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-subtitle" id="dashSubtitle">Bienvenido a NEXORA</div>
+      </div>
+      <div id="dashDate" class="text-muted text-sm"></div>
+    </div>
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="kpi-card"><div class="kpi-icon blue">📍</div><div><div class="kpi-label">Asistencias hoy</div><div class="kpi-value" id="kpiAtt">–</div></div></div>
+      <div class="kpi-card"><div class="kpi-icon yellow">⏳</div><div><div class="kpi-label">Reembolsos pendientes</div><div class="kpi-value" id="kpiPend">–</div></div></div>
+      <div class="kpi-card"><div class="kpi-icon green">💰</div><div><div class="kpi-label">Monto aprobado (mes)</div><div class="kpi-value" id="kpiMonto">–</div></div></div>
+      <div class="kpi-card"><div class="kpi-icon cyan">📂</div><div><div class="kpi-label">Mis documentos</div><div class="kpi-value" id="kpiDocs">–</div></div></div>
+    </div>
+
+    <!-- Accesos rápidos -->
+    <div class="card mb-16">
+      <h3 class="mb-16">Accesos rápidos</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
+        <button class="checkin-btn" onclick="App.goTo('attendance')">
+          <div class="checkin-icon">📍</div>
+          <div class="checkin-label">Asistencia</div>
+        </button>
+        <button class="checkin-btn" onclick="App.goTo('reimbursements')">
+          <div class="checkin-icon">💳</div>
+          <div class="checkin-label">Reembolsos</div>
+        </button>
+        <button class="checkin-btn" onclick="App.goTo('documents')">
+          <div class="checkin-icon">📂</div>
+          <div class="checkin-label">Documentos</div>
+        </button>
+        <button class="checkin-btn admin-only" onclick="App.goTo('reports')">
+          <div class="checkin-icon">📈</div>
+          <div class="checkin-label">Reportes</div>
+        </button>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="dash-grid">
+      <div class="card">
+        <div class="flex-between mb-16">
+          <h3>Asistencia reciente</h3>
+          <button class="btn btn-ghost btn-sm" onclick="App.goTo('attendance')">Ver todo</button>
+        </div>
+        <ul class="recent-list" id="dashRecentAtt">
+          <li class="loading-page"><div class="spinner"></div></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="flex-between mb-16">
+          <h3>Reembolsos recientes</h3>
+          <button class="btn btn-ghost btn-sm" onclick="App.goTo('reimbursements')">Ver todo</button>
+        </div>
+        <ul class="recent-list" id="dashRecentRei">
+          <li class="loading-page"><div class="spinner"></div></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ASISTENCIA ── -->
+  <section id="module-attendance" class="module-section">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Control de Asistencia</div>
+        <div class="page-subtitle">Registro con geolocalización</div>
+      </div>
+      <a href="/api/attendance/export" id="exportAttBtn" class="btn btn-secondary" download>⬇ Exportar CSV</a>
+    </div>
+
+    <div class="card mb-16">
+      <h3 class="mb-16">Marcar asistencia</h3>
+      <div id="gpsStatus" class="gps-status loading">🔄 Obteniendo ubicación GPS...</div>
+      <div class="checkin-grid">
+        <button class="checkin-btn entrada" id="btnCheckin" onclick="Attendance.checkin()">
+          <div class="checkin-icon">🟢</div>
+          <div class="checkin-label">Marcar Entrada</div>
+          <div class="checkin-sub" id="checkinTime">–</div>
+        </button>
+        <button class="checkin-btn" id="btnCheckout" onclick="Attendance.checkout()">
+          <div class="checkin-icon">🔴</div>
+          <div class="checkin-label">Marcar Salida</div>
+          <div class="checkin-sub" id="checkoutTime">–</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex-between mb-16" style="flex-wrap:wrap;gap:10px">
+        <h3>Registros</h3>
+        <div class="filters-bar" style="margin:0">
+          <div class="filter-group">
+            <label>Desde</label>
+            <input type="date" class="form-input filter-input" id="attFrom"/>
+          </div>
+          <div class="filter-group">
+            <label>Hasta</label>
+            <input type="date" class="form-input filter-input" id="attTo"/>
+          </div>
+          <div class="filter-group admin-only">
+            <label>Trabajador</label>
+            <select class="form-select filter-input" id="attWorker" style="min-width:150px">
+              <option value="">Todos</option>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="Attendance.load()">Buscar</button>
+          <button class="btn btn-secondary btn-sm" onclick="Attendance.clearFilters()">Limpiar</button>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table class="table">
+          <thead><tr>
+            <th>Fecha</th>
+            <th class="admin-only">Trabajador</th>
+            <th class="admin-only">Tipo</th>
+            <th>Entrada</th>
+            <th>Salida</th>
+            <th>Ubicación</th>
+            <th>Estado</th>
+          </tr></thead>
+          <tbody id="attBody"><tr><td colspan="7" class="text-muted" style="text-align:center;padding:40px">Cargando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── REEMBOLSOS ── -->
+  <section id="module-reimbursements" class="module-section">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Reembolsos</div>
+        <div class="page-subtitle">Solicitudes de gastos</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <a href="/api/reimbursements/export" id="exportReiBtn" class="btn btn-secondary" download>⬇ Exportar CSV</a>
+        <button class="btn btn-primary" onclick="Reimbursements.openNew()">+ Nueva solicitud</button>
+      </div>
+    </div>
+
+    <div class="card mb-16">
+      <div class="filters-bar">
+        <div class="filter-group">
+          <label>Estado</label>
+          <select class="form-select filter-input" id="reiStatus">
+            <option value="">Todos</option>
+            <option value="pending">Pendiente</option>
+            <option value="approved">Aprobado</option>
+            <option value="rejected">Rechazado</option>
+            <option value="paid">Pagado</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Desde</label>
+          <input type="date" class="form-input filter-input" id="reiFrom"/>
+        </div>
+        <div class="filter-group">
+          <label>Hasta</label>
+          <input type="date" class="form-input filter-input" id="reiTo"/>
+        </div>
+        <div class="filter-group admin-only">
+          <label>Trabajador</label>
+          <select class="form-select filter-input" id="reiWorker" style="min-width:150px">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="Reimbursements.load()">Buscar</button>
+        <button class="btn btn-secondary btn-sm" onclick="Reimbursements.clearFilters()">Limpiar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="table-wrapper">
+        <table class="table">
+          <thead><tr>
+            <th>Fecha</th>
+            <th class="admin-only">Trabajador</th>
+            <th>Concepto</th>
+            <th>Proveedor / RUC</th>
+            <th>Comprobante</th>
+            <th>Monto</th>
+            <th>Adjuntos</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr></thead>
+          <tbody id="reiBody"><tr><td colspan="9" class="text-muted" style="text-align:center;padding:40px">Cargando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DOCUMENTOS ── -->
+  <section id="module-documents" class="module-section">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Documentos de RRHH</div>
+        <div class="page-subtitle">Boletas, contratos, constancias y más</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <a href="/api/documents/export" class="btn btn-secondary admin-only" download>⬇ Exportar CSV</a>
+        <button class="btn btn-primary admin-only" onclick="Documents.openNew()">+ Subir documento</button>
+      </div>
+    </div>
+
+    <div class="card mb-16">
+      <div class="filters-bar">
+        <div class="filter-group">
+          <label>Tipo</label>
+          <select class="form-select filter-input" id="docType">
+            <option value="">Todos</option>
+            <option value="boleta_pago">Boleta de Pago</option>
+            <option value="contrato">Contrato</option>
+            <option value="constancia">Constancia</option>
+            <option value="rh">Recibo por Honorarios</option>
+            <option value="cts">CTS</option>
+            <option value="vacaciones">Vacaciones</option>
+            <option value="memorandum">Memorándum</option>
+            <option value="certificado">Certificado</option>
+            <option value="liquidacion">Liquidación</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div class="filter-group admin-only">
+          <label>Trabajador</label>
+          <select class="form-select filter-input" id="docWorker" style="min-width:160px">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="Documents.load()">Buscar</button>
+        <button class="btn btn-secondary btn-sm" onclick="Documents.clearFilters()">Limpiar</button>
+      </div>
+    </div>
+
+    <div id="docsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">
+      <div class="loading-page"><div class="spinner"></div></div>
+    </div>
+  </section>
+
+  <!-- ── TRABAJADORES ── -->
+  <section id="module-workers" class="module-section">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Trabajadores</div>
+        <div class="page-subtitle">Gestión de usuarios</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a href="/api/workers/export" class="btn btn-secondary" download>⬇ Exportar CSV</a>
+        <button class="btn btn-secondary" onclick="Workers.downloadPlantilla()">📥 Plantilla CSV</button>
+        <button class="btn btn-secondary" onclick="Workers.openImport()">⬆ Importar lista</button>
+        <button class="btn btn-primary" onclick="Workers.openNew()">+ Nuevo trabajador</button>
+      </div>
+    </div>
+    <div class="card mb-16">
+      <div class="filters-bar">
+        <div class="filter-group" style="flex:1">
+          <label>Buscar</label>
+          <input type="text" class="form-input" id="workerSearch" placeholder="Nombre o DNI..." style="min-width:220px" oninput="Workers.load()"/>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-wrapper">
+        <table class="table">
+          <thead><tr>
+            <th>Trabajador</th>
+            <th>Tipo</th>
+            <th>Empresa / RUC</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr></thead>
+          <tbody id="workersBody"><tr><td colspan="6" class="text-muted" style="text-align:center;padding:40px">Cargando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── REPORTES ── -->
+  <section id="module-reports" class="module-section">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Reportes</div>
+        <div class="page-subtitle">Exportación de datos a CSV</div>
+      </div>
+    </div>
+
+    <div class="card mb-16">
+      <h3 class="mb-16">Filtros del reporte</h3>
+      <div class="form-grid-2" style="gap:14px;max-width:500px">
+        <div class="form-group">
+          <label class="form-label">Desde</label>
+          <input type="date" class="form-input" id="repFrom"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hasta</label>
+          <input type="date" class="form-input" id="repTo"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Trabajador</label>
+          <select class="form-select" id="repWorker">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Estado reembolso</label>
+          <select class="form-select" id="repStatus">
+            <option value="">Todos</option>
+            <option value="pending">Pendiente</option>
+            <option value="approved">Aprobado</option>
+            <option value="paid">Pagado</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="Reports.loadStats()">Actualizar estadísticas</button>
+    </div>
+
+    <div class="kpi-grid mb-16" id="reportStats">
+      <div class="kpi-card"><div class="kpi-icon blue">📍</div><div><div class="kpi-label">Registros asistencia</div><div class="kpi-value" id="repAtt">–</div></div></div>
+      <div class="kpi-card"><div class="kpi-icon cyan">👥</div><div><div class="kpi-label">Trabajadores únicos</div><div class="kpi-value" id="repWorkers">–</div></div></div>
+      <div class="kpi-card"><div class="kpi-icon green">💰</div><div><div class="kpi-label">Total reembolsos S/</div><div class="kpi-value" id="repMonto">–</div></div></div>
+      <div class="kpi-card"><div class="kpi-icon yellow">⏳</div><div><div class="kpi-label">Pendientes</div><div class="kpi-value" id="repPend">–</div></div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+      <div class="card card-hover">
+        <div style="font-size:2rem;margin-bottom:8px">📍</div>
+        <h3>Asistencia</h3>
+        <p class="text-muted text-sm mt-4">Fecha, trabajador, horas, ubicación</p>
+        <button class="btn btn-primary btn-full mt-16" onclick="Reports.download('attendance')">⬇ Descargar CSV</button>
+      </div>
+      <div class="card card-hover">
+        <div style="font-size:2rem;margin-bottom:8px">💳</div>
+        <h3>Reembolsos</h3>
+        <p class="text-muted text-sm mt-4">Montos, proveedores, estados</p>
+        <button class="btn btn-primary btn-full mt-16" onclick="Reports.download('reimbursements')">⬇ Descargar CSV</button>
+      </div>
+      <div class="card card-hover">
+        <div style="font-size:2rem;margin-bottom:8px">📂</div>
+        <h3>Documentos</h3>
+        <p class="text-muted text-sm mt-4">Tipos, períodos, tamaños</p>
+        <button class="btn btn-primary btn-full mt-16" onclick="Reports.download('documents')">⬇ Descargar CSV</button>
+      </div>
+      <div class="card card-hover">
+        <div style="font-size:2rem;margin-bottom:8px">📊</div>
+        <h3>Resumen General</h3>
+        <p class="text-muted text-sm mt-4">Por trabajador: asistencia, reembolsos, docs</p>
+        <button class="btn btn-primary btn-full mt-16" onclick="Reports.download('summary')">⬇ Descargar CSV</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CONFIGURACIÓN ── -->
+  <section id="module-config" class="module-section">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Configuración</div>
+        <div class="page-subtitle">Backup, restauración y estadísticas del sistema</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+      <div class="card">
+        <h3 class="mb-8">💾 Información del sistema</h3>
+        <div id="configStats" class="mt-16">
+          <div class="loading-page"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="mb-8">📤 Exportar Backup</h3>
+        <p class="text-muted text-sm mt-4 mb-16">Descarga un archivo JSON con TODOS los datos de la base de datos (no incluye archivos adjuntos).</p>
+        <a href="/api/backup/export" class="btn btn-primary" download>⬇ Exportar Backup JSON</a>
+      </div>
+
+      <div class="card">
+        <h3 class="mb-8">📥 Restaurar Backup</h3>
+        <p class="text-muted text-sm mt-4 mb-16">Sube un archivo JSON previamente exportado para restaurar los datos.</p>
+        <input type="file" id="backupFile" accept=".json" class="hidden"/>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary" onclick="document.getElementById('backupFile').click()">📁 Seleccionar JSON</button>
+          <button class="btn btn-primary" onclick="Config.importBackup()">Restaurar</button>
+        </div>
+        <div id="backupFileName" class="text-muted text-sm mt-8"></div>
+      </div>
+
+      <div class="card">
+        <h3 class="mb-8">🔄 Restaurar Demo</h3>
+        <p class="text-muted text-sm mt-4 mb-16">Borra TODOS los datos y recarga los 4 usuarios de demostración. <strong class="text-danger">Esta acción no se puede deshacer.</strong></p>
+        <button class="btn btn-danger" onclick="Config.resetDemo()">Restaurar valores por defecto</button>
+      </div>
+
+      <div class="card" style="grid-column:1/-1">
+        <h3 class="mb-8">📁 Nota sobre archivos adjuntos</h3>
+        <div class="alert alert-info mt-8">
+          <span>ℹ️</span>
+          <div>
+            Los comprobantes y documentos se guardan en la carpeta <code style="background:var(--bg-table-alt);padding:2px 6px;border-radius:4px">uploads/</code> del servidor.
+            Usa <strong>Sincronizar a OneDrive</strong> para copiarlos automáticamente.
+            El backup JSON exporta solo la metadata (no los archivos físicos).
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Almacenamiento en la nube ── -->
+      <div class="card" style="grid-column:1/-1">
+        <div class="flex-between mb-16">
+          <h3>☁️ Almacenamiento en la Nube</h3>
+          <button class="btn btn-primary btn-sm" onclick="Config.addEmpresa()">+ Agregar empresa</button>
+        </div>
+        <div class="table-wrapper">
+          <table class="drive-table" id="driveTable">
+            <thead><tr>
+              <th>Empresa</th><th>RUC</th><th>Gmail Drive</th><th>Ruta OneDrive</th><th>Acciones</th>
+            </tr></thead>
+            <tbody id="driveBody">
+              <tr><td colspan="5" style="text-align:center;padding:20px"><div class="spinner"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert alert-info mt-16">
+          <span>🔵</span>
+          <div>
+            <strong>Google Drive (manual):</strong> Descarga los backups y reportes CSV y súbelos manualmente al Drive de cada empresa:<br>
+            · JVÑ: <em>generalservicesjvn@gmail.com</em> &nbsp;·&nbsp; PEVAL: <em>pevalcorp@gmail.com</em><br>
+            <small>La integración automática con Google Drive (API) se habilitará en una fase futura.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /main-content -->
+
+<!-- ══ MODALES ════════════════════════════════════════════════ -->
+
+<!-- Modal nuevo reembolso -->
+<div class="modal-overlay" id="modalReembolso">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Nueva solicitud de reembolso</span>
+      <button class="modal-close" onclick="closeModal('modalReembolso')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Concepto <span class="required">*</span></label>
+          <input type="text" class="form-input" id="rConcepto" placeholder="Ej: Combustible para obra"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Monto S/ <span class="required">*</span></label>
+          <input type="number" step="0.01" min="0" class="form-input" id="rMonto" placeholder="0.00"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">RUC del proveedor</label>
+          <input type="text" class="form-input" id="rRuc" maxlength="11" placeholder="20xxxxxxxxx (10 u 11 dígitos)" inputmode="numeric"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nombre / Razón social</label>
+          <input type="text" class="form-input" id="rProveedor" placeholder="Empresa o persona"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo de comprobante</label>
+          <select class="form-select" id="rTipoDoc">
+            <option value="">Seleccionar</option>
+            <option>Factura</option>
+            <option>Boleta de Venta</option>
+            <option>Recibo</option>
+            <option>Ticket/Voucher</option>
+            <option>Planilla de Movilidad</option>
+            <option>Sin comprobante</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">N° de documento</label>
+          <input type="text" class="form-input" id="rNumDoc" placeholder="F001-00012345"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notas adicionales</label>
+        <textarea class="form-textarea" id="rNotas" placeholder="Observaciones opcionales..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Adjuntar comprobante</label>
+        <div class="upload-zone" id="rUploadZone">
+          <div class="upload-zone-icon">📎</div>
+          <div class="upload-zone-text">
+            Arrastra tu archivo aquí o <strong>haz clic</strong> para seleccionar
+          </div>
+        </div>
+        <div class="upload-actions">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('rFile').click()">
+            📁 Seleccionar archivo
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('rCamera').click()">
+            📷 Tomar foto
+          </button>
+        </div>
+        <input type="file" id="rFile" multiple accept="image/*,application/pdf,.xlsx,.docx" class="hidden" onchange="Reimbursements.onFileSelect(this.files)"/>
+        <input type="file" id="rCamera" multiple accept="image/*" capture="environment" class="hidden" onchange="Reimbursements.onFileSelect(this.files)"/>
+        <div id="rFilePreview"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalReembolso')">Cancelar</button>
+      <button class="btn btn-primary" id="btnSaveReembolso" onclick="Reimbursements.save()">Enviar solicitud</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal nuevo documento -->
+<div class="modal-overlay" id="modalDocumento">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Subir documento de RRHH</span>
+      <button class="modal-close" onclick="closeModal('modalDocumento')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Trabajador destino <span class="required">*</span></label>
+        <select class="form-select" id="dWorker">
+          <option value="">Seleccionar trabajador...</option>
+        </select>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Tipo de documento <span class="required">*</span></label>
+          <select class="form-select" id="dTipo">
+            <option value="boleta_pago">Boleta de Pago</option>
+            <option value="contrato">Contrato</option>
+            <option value="constancia">Constancia</option>
+            <option value="rh">Recibo por Honorarios</option>
+            <option value="cts">CTS</option>
+            <option value="vacaciones">Vacaciones</option>
+            <option value="memorandum">Memorándum</option>
+            <option value="certificado">Certificado</option>
+            <option value="liquidacion">Liquidación</option>
+            <option value="otro">Otro Documento</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Período</label>
+          <input type="month" class="form-input" id="dPeriodo"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Título / descripción <span class="required">*</span></label>
+        <input type="text" class="form-input" id="dTitulo" placeholder="Ej: Boleta de Pago - Abril 2026"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Archivo <span class="required">*</span></label>
+        <div class="upload-zone" id="dUploadZone">
+          <div class="upload-zone-icon">📎</div>
+          <div class="upload-zone-text">Arrastra o <strong>selecciona</strong> el archivo (PDF, imagen, Word)</div>
+        </div>
+        <div class="upload-actions">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('dFile').click()">
+            📁 Seleccionar archivo
+          </button>
+        </div>
+        <input type="file" id="dFile" accept=".pdf,image/*,.docx,.xlsx" class="hidden" onchange="Documents.onFileSelect(this)"/>
+        <div id="dFilePreview"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalDocumento')">Cancelar</button>
+      <button class="btn btn-primary" id="btnSaveDoc" onclick="Documents.save()">Subir documento</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal nuevo/editar trabajador -->
+<div class="modal-overlay" id="modalWorker">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title" id="modalWorkerTitle">Nuevo trabajador</span>
+      <button class="modal-close" onclick="closeModal('modalWorker')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="wId"/>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">DNI <span class="required">*</span></label>
+          <input type="text" class="form-input" id="wDni" maxlength="8" inputmode="numeric" placeholder="12345678"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nombre completo <span class="required">*</span></label>
+          <input type="text" class="form-input" id="wNombre" placeholder="Nombre y apellidos"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña <span class="required">*</span></label>
+          <input type="text" class="form-input" id="wPassword" placeholder="Clave de acceso"/>
+          <span id="wPasswordHelp" class="text-muted text-sm">Obligatoria para nuevo trabajador</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Rol</label>
+          <select class="form-select" id="wRol">
+            <option value="worker">Trabajador</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo</label>
+          <select class="form-select" id="wTipo">
+            <option value="planilla">En Planilla</option>
+            <option value="externo">Externo (RH)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Empresa</label>
+          <input type="text" class="form-input" id="wEmpresa" placeholder="Nombre de la empresa"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">RUC empresa</label>
+          <input type="text" class="form-input" id="wRuc" maxlength="11" placeholder="20xxxxxxxxx"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="wEmail" placeholder="correo@empresa.com"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Teléfono</label>
+          <input type="text" class="form-input" id="wTelefono" placeholder="9xx xxx xxx"/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalWorker')">Cancelar</button>
+      <button class="btn btn-primary" id="btnSaveWorker" onclick="Workers.save()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal importar trabajadores -->
+<div class="modal-overlay" id="modalImportWorkers">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title">Importar trabajadores desde Excel / CSV</span>
+      <button class="modal-close" onclick="closeModal('modalImportWorkers')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info mb-16">
+        <span>ℹ️</span>
+        <div>Sube un Excel <strong>(.xlsx)</strong> o <strong>CSV</strong> con columnas: <strong>DNI, Nombre</strong> (opcionales: Empresa, RUC, Tipo, Email, Telefono).<br>
+        La contraseña inicial de cada trabajador será <strong>su propio DNI</strong>. Podrán cambiarla después.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Seleccionar archivo Excel o CSV</label>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📁 Seleccionar archivo</button>
+          <button class="btn btn-ghost btn-sm" onclick="Workers.downloadPlantilla()">📥 Descargar plantilla CSV</button>
+        </div>
+        <div id="importFileName" class="text-muted text-sm mt-8">Ningún archivo seleccionado</div>
+        <input type="file" id="importFile" accept=".xlsx,.xls,.csv" class="hidden" onchange="Workers.onImportFile(this)"/>
+      </div>
+      <div id="importPreview" class="mt-16"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalImportWorkers')">Cancelar</button>
+      <button class="btn btn-primary" id="btnExecuteImport" onclick="Workers.executeImport()">⬆ Importar trabajadores</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal cambiar contraseña -->
+<div class="modal-overlay" id="modalChangePassword">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🔑 Cambiar contraseña</span>
+      <button class="modal-close" onclick="closeModal('modalChangePassword')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Contraseña actual <span class="required">*</span></label>
+        <input type="password" class="form-input" id="cpActual" placeholder="Tu contraseña actual" autocomplete="current-password"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nueva contraseña <span class="required">*</span></label>
+        <input type="password" class="form-input" id="cpNueva" placeholder="Mínimo 4 caracteres" autocomplete="new-password"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirmar nueva contraseña <span class="required">*</span></label>
+        <input type="password" class="form-input" id="cpConfirm" placeholder="Repetir nueva contraseña" autocomplete="new-password"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalChangePassword')">Cancelar</button>
+      <button class="btn btn-primary" id="btnChangePass" onclick="Auth.changePassword()">Cambiar contraseña</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<!-- XLSX: lector de Excel para importación de trabajadores -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/dashboard.js"></script>
+<script src="/js/attendance.js"></script>
+<script src="/js/reimbursements.js"></script>
+<script src="/js/documents.js"></script>
+<script src="/js/workers.js"></script>
+<script src="/js/reports.js"></script>
+<script src="/js/config.js"></script>
+</body>
+</html>
