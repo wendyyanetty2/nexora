@@ -917,14 +917,14 @@ app.use((err, _req, res, _next) => {
 });
 
 // ─── Iniciar ─────────────────────────────────────────────────
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log('');
   console.log('╔══════════════════════════════════════╗');
   console.log('║       NEXORA — Sistema activo        ║');
   console.log('╠══════════════════════════════════════╣');
-  console.log(`║  http://localhost:${PORT}               ║`);
+  console.log(`║  Puerto: ${PORT}                     ║`);
   console.log('║                                      ║');
-  console.log('║  Admin: DNI 12345678  Clave: 1234   ║');
+  console.log('║  Admin: DNI 12345678  Clave: 1234    ║');
   console.log('╚══════════════════════════════════════╝');
   console.log('');
 });
