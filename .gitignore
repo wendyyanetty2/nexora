@@ -1,0 +1,7 @@
+node_modules/
+nexora.db
+nexora.db-shm
+nexora.db-wal
+uploads/
+.env
+*.log

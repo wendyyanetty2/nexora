@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NEXORA — Iniciar sesión</title>
+  <link rel="icon" href="/img/logo.svg"/>
+  <link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body>
+  <!-- Toggle dark en esquina -->
+  <div class="login-header">
+    <button class="icon-btn" id="loginThemeToggle" title="Cambiar tema" style="color:#94a3b8">
+      <span id="loginThemeIcon">🌙</span>
+    </button>
+  </div>
+
+  <div class="login-page">
+    <div class="login-card">
+      <!-- Logo -->
+      <div class="login-logo">
+        <img src="/img/logo.svg" alt="NEXORA"/>
+        <div class="brand-name">NEXORA</div>
+        <div class="brand-sub">Control de Asistencia y Reembolsos</div>
+      </div>
+
+      <!-- Error -->
+      <div class="login-error" id="loginError"></div>
+
+      <!-- Formulario -->
+      <form id="loginForm" autocomplete="on">
+        <div class="form-group">
+          <label class="form-label" for="dni">DNI <span class="required">*</span></label>
+          <input
+            class="form-input" id="dni" name="dni" type="text"
+            inputmode="numeric" maxlength="8"
+            placeholder="Ingresa tu DNI (8 dígitos)"
+            autocomplete="username" required
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Contraseña <span class="required">*</span></label>
+          <div style="position:relative">
+            <input
+              class="form-input" id="password" name="password" type="password"
+              placeholder="••••••••" autocomplete="current-password" required
+              style="padding-right:42px"
+            />
+            <button type="button" id="togglePwd" tabindex="-1"
+              style="position:absolute;right:10px;top:50%;transform:translateY(-50%);
+                     background:none;border:none;cursor:pointer;color:var(--text-secondary);font-size:1rem;">
+              👁
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full btn-lg" id="loginBtn">
+          Ingresar
+        </button>
+      </form>
+
+      <!-- Accesos de muestra — las credenciales de administrador se entregan por interno -->
+      <div class="login-demo">
+        <div style="font-weight:600;margin-bottom:8px;color:var(--primary)">👤 Usuarios de muestra</div>
+        <div class="login-demo-row"><span><strong>Carlos (planilla):</strong> DNI 87654321</span><span>Clave: 1234</span></div>
+        <div class="login-demo-row"><span><strong>María (externo):</strong> DNI 11223344</span><span>Clave: 1234</span></div>
+        <div class="login-demo-row"><span><strong>Jorge (PEVAL):</strong> DNI 55667788</span><span>Clave: 1234</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Tema ──
+    const savedTheme = localStorage.getItem('nexora_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    const icon = document.getElementById('loginThemeIcon');
+    if (icon) icon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+    document.getElementById('loginThemeToggle').addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', cur);
+      localStorage.setItem('nexora_theme', cur);
+      icon.textContent = cur === 'dark' ? '☀️' : '🌙';
+    });
+
+    // ── Toggle password ──
+    document.getElementById('togglePwd').addEventListener('click', () => {
+      const inp = document.getElementById('password');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    });
+
+    // ── Login ──
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      const err = document.getElementById('loginError');
+      const dni = document.getElementById('dni').value.trim();
+      const password = document.getElementById('password').value;
+
+      err.classList.remove('show');
+      btn.disabled = true;
+      btn.textContent = 'Verificando...';
+
+      try {
+        const r = await fetch('/api/auth/login', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dni, password })
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || 'Error de login');
+        window.location.href = '/app';
+      } catch (ex) {
+        err.textContent = ex.message;
+        err.classList.add('show');
+        btn.disabled = false;
+        btn.textContent = 'Ingresar';
+      }
+    });
+
+    // ── Verificar sesión activa ──
+    fetch('/api/auth/me', { credentials: 'include' }).then(r => {
+      if (r.ok) window.location.href = '/app';
+    }).catch(() => {});
+  </script>
+</body>
+</html>
