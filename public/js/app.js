@@ -1,5 +1,5 @@
 // ============================================================
-//  NEXORA — app.js  (núcleo: tema, navegación, utilidades)
+//  NEXORA — app.js  (núcleo: roles, navegación, utilidades)
 // ============================================================
 'use strict';
 
@@ -7,12 +7,16 @@
 const App = {
   currentUser: null,
   currentModule: 'dashboard',
+  canApprove: false,
+
+  /* ── Helpers de roles ── */
+  isAdmin()      { return ['administrador','superadministrador'].includes(App.currentUser?.rol); },
+  isSuperAdmin() { return App.currentUser?.rol === 'superadministrador'; },
+  canViewAll()   { return ['supervisor','gerente','administrador','superadministrador'].includes(App.currentUser?.rol); },
 
   /* ── Init ── */
   async init() {
-    // Tema
     Theme.init();
-    // Verificar sesión
     try {
       const r = await api('/auth/me');
       App.currentUser = r.user;
@@ -20,24 +24,18 @@ const App = {
       window.location.href = '/';
       return;
     }
-    // Mostrar datos de usuario en sidebar
+
+    // Cargar potestad de aprobación
+    try {
+      const p = await api('/config/potestades/me');
+      App.canApprove = p.puede_aprobar || false;
+    } catch { App.canApprove = false; }
+
     App.renderUser();
-    // Mostrar/ocultar elementos de admin
-    if (App.currentUser.rol === 'admin') {
-      document.querySelectorAll('.admin-only').forEach(el => {
-        el.style.display = el.tagName === 'DIV' || el.tagName === 'SECTION' ? 'flex' : '';
-        if (el.classList.contains('nav-section-label')) el.style.display = 'block';
-        if (el.classList.contains('nav-link')) el.style.display = 'flex';
-        if (el.classList.contains('btn')) el.style.display = 'inline-flex';
-        if (el.tagName === 'A') el.style.display = 'inline-flex';
-        if (el.tagName === 'TH' || el.tagName === 'TD') el.style.display = 'table-cell';
-      });
-    }
-    // Navegación
+    App.applyRoleVisibility();
     App.initNav();
-    // Cargar workers para selects (solo admin)
-    if (App.currentUser.rol === 'admin') await App.loadWorkerSelects();
-    // Ir al módulo inicial
+
+    if (App.isAdmin()) await App.loadWorkerSelects();
     App.goTo('dashboard');
   },
 
@@ -48,20 +46,64 @@ const App = {
     const role   = document.getElementById('sidebarRole');
     if (avatar) avatar.textContent = u.nombre.charAt(0).toUpperCase();
     if (name)   name.textContent = u.nombre;
-    if (role)   role.textContent = u.rol === 'admin' ? '🛡 Administrador' : (u.tipo === 'externo' ? '📋 Externo (RH)' : '👷 Planilla');
+    if (role)   role.textContent = App._rolLabel(u.rol);
+  },
+
+  _rolLabel(rol) {
+    const map = {
+      trabajador:        '👷 Trabajador',
+      supervisor:        '👁 Supervisor',
+      gerente:           '📋 Gerente',
+      administrador:     '🛡 Administrador',
+      superadministrador:'⭐ Super Admin',
+    };
+    return map[rol] || rol;
+  },
+
+  applyRoleVisibility() {
+    // admin-only: visible para administrador y superadministrador
+    document.querySelectorAll('.admin-only').forEach(el => {
+      if (!App.isAdmin()) {
+        el.style.display = 'none';
+        return;
+      }
+      // Restaurar display por tipo de elemento
+      if (el.tagName === 'TH' || el.tagName === 'TD') el.style.display = 'table-cell';
+      else if (el.classList.contains('nav-link') || el.classList.contains('btn')) el.style.display = '';
+      else if (el.classList.contains('nav-section-label')) el.style.display = 'block';
+      else el.style.display = '';
+    });
+
+    // superadmin-only: visible solo para superadministrador
+    document.querySelectorAll('.superadmin-only').forEach(el => {
+      if (!App.isSuperAdmin()) {
+        el.style.display = 'none';
+        return;
+      }
+      if (el.classList.contains('nav-link')) el.style.display = '';
+      else if (el.classList.contains('nav-section-label')) el.style.display = 'block';
+      else el.style.display = '';
+    });
+
+    // elevated-only: visible para supervisor y superior (pueden ver todos los datos)
+    document.querySelectorAll('.elevated-only').forEach(el => {
+      if (!App.canViewAll()) {
+        el.style.display = 'none';
+        return;
+      }
+      if (el.tagName === 'TH' || el.tagName === 'TD') el.style.display = 'table-cell';
+      else el.style.display = '';
+    });
   },
 
   initNav() {
     document.querySelectorAll('.nav-link[data-module]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const mod = btn.dataset.module;
-        App.goTo(mod);
-        // Cerrar sidebar en móvil
+        App.goTo(btn.dataset.module);
         document.getElementById('sidebar').classList.remove('open');
         document.getElementById('sidebarOverlay').classList.remove('show');
       });
     });
-    // Hamburguesa
     document.getElementById('hamburger')?.addEventListener('click', () => {
       document.getElementById('sidebar').classList.toggle('open');
       document.getElementById('sidebarOverlay').classList.toggle('show');
@@ -70,21 +112,17 @@ const App = {
       document.getElementById('sidebar').classList.remove('open');
       document.getElementById('sidebarOverlay').classList.remove('show');
     });
-    // Logout
     document.getElementById('logoutBtn')?.addEventListener('click', Auth.logout);
   },
 
   goTo(module) {
     App.currentModule = module;
-    // Activar link
     document.querySelectorAll('.nav-link[data-module]').forEach(b => {
       b.classList.toggle('active', b.dataset.module === module);
     });
-    // Mostrar sección
     document.querySelectorAll('.module-section').forEach(s => {
       s.classList.toggle('active', s.id === `module-${module}`);
     });
-    // Cargar datos
     const loaders = {
       dashboard:      () => Dashboard.load(),
       attendance:     () => Attendance.load(),
@@ -93,6 +131,7 @@ const App = {
       workers:        () => Workers.load(),
       reports:        () => Reports.loadStats(),
       config:         () => Config.loadStats(),
+      catalogos:      () => Catalogos.load(),
     };
     loaders[module]?.();
   },
@@ -108,7 +147,7 @@ const App = {
         sel.innerHTML = first;
         workers.forEach(w => {
           const opt = document.createElement('option');
-          opt.value = id === 'dWorker' ? w.id : w.id;
+          opt.value = w.id;
           opt.textContent = `${w.nombre} (${w.dni})`;
           if (!w.activo) opt.textContent += ' — inactivo';
           sel.appendChild(opt);
@@ -175,17 +214,10 @@ function toast(msg, type = 'success') {
 }
 
 /* ── Modal helpers ───────────────────────────────────────────── */
-function openModal(id) {
-  document.getElementById(id)?.classList.add('open');
-}
-function closeModal(id) {
-  document.getElementById(id)?.classList.remove('open');
-}
-// Cerrar al hacer clic fuera
+function openModal(id)  { document.getElementById(id)?.classList.add('open'); }
+function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
 document.addEventListener('click', (e) => {
-  if (e.target.classList.contains('modal-overlay')) {
-    e.target.classList.remove('open');
-  }
+  if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');
 });
 
 /* ── Drag & Drop genérico ────────────────────────────────────── */
@@ -195,12 +227,8 @@ function initDragDrop(zoneId, onFiles) {
   zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
   zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
   zone.addEventListener('drop', e => {
-    e.preventDefault();
-    zone.classList.remove('dragover');
+    e.preventDefault(); zone.classList.remove('dragover');
     onFiles(e.dataTransfer.files);
-  });
-  zone.addEventListener('click', () => {
-    // El botón "Seleccionar archivo" maneja esto
   });
 }
 
@@ -214,16 +242,28 @@ function fmtMoney(n) {
 }
 function statusBadge(status) {
   const map = {
-    pending:   ['badge-warning', 'Pendiente'],
-    approved:  ['badge-success', 'Aprobado'],
-    rejected:  ['badge-danger',  'Rechazado'],
-    paid:      ['badge-primary', 'Pagado'],
-    activo:    ['badge-success', 'Activo'],
-    completado:['badge-gray',    'Completado'],
-    active:    ['badge-success', 'Activo'],
+    // nuevos estados
+    enviado:     ['badge-blue',    'Enviado'],
+    en_revision: ['badge-warning', 'En revisión'],
+    aprobado:    ['badge-success', 'Aprobado'],
+    pagado:      ['badge-teal',    'Pagado'],
+    rechazado:   ['badge-danger',  'Rechazado'],
+    // estados legacy (por compatibilidad)
+    pending:     ['badge-warning', 'Pendiente'],
+    approved:    ['badge-success', 'Aprobado'],
+    rejected:    ['badge-danger',  'Rechazado'],
+    paid:        ['badge-primary', 'Pagado'],
+    // asistencia
+    activo:      ['badge-success', 'Activo'],
+    completado:  ['badge-gray',    'Completado'],
+    active:      ['badge-success', 'Activo'],
   };
   const [cls, label] = map[status] || ['badge-gray', status];
   return `<span class="badge ${cls}">${label}</span>`;
+}
+function tipoGastoLabel(t) {
+  const map = { transporte: '🚗 Transporte', viaticos: '🍽 Viáticos', compras: '🛒 Compras' };
+  return map[t] || t || '–';
 }
 function docTypeLabel(t) {
   const map = {

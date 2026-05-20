@@ -13,8 +13,6 @@
 
   <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
   <aside class="sidebar" id="sidebar">
-
-    <!-- Logo -->
     <div class="sidebar-logo">
       <img src="/img/logo.svg" alt="NEXORA"/>
       <div class="sidebar-logo-text">
@@ -23,36 +21,22 @@
       </div>
     </div>
 
-    <!-- Navegación -->
     <nav class="sidebar-nav">
       <div class="nav-section-label">Principal</div>
-
-      <button class="nav-link" data-module="dashboard">
-        <span class="icon">🏠</span> Dashboard
-      </button>
-      <button class="nav-link" data-module="attendance">
-        <span class="icon">📍</span> Asistencia
-      </button>
-      <button class="nav-link" data-module="reimbursements">
-        <span class="icon">💳</span> Reembolsos
-      </button>
-      <button class="nav-link" data-module="documents">
-        <span class="icon">📂</span> Documentos
-      </button>
+      <button class="nav-link" data-module="dashboard"><span class="icon">🏠</span> Dashboard</button>
+      <button class="nav-link" data-module="attendance"><span class="icon">📍</span> Asistencia</button>
+      <button class="nav-link" data-module="reimbursements"><span class="icon">💳</span> Reembolsos</button>
+      <button class="nav-link" data-module="documents"><span class="icon">📂</span> Documentos</button>
 
       <div class="nav-section-label admin-only">Administración</div>
-      <button class="nav-link admin-only" data-module="workers">
-        <span class="icon">👥</span> Trabajadores
-      </button>
-      <button class="nav-link admin-only" data-module="reports">
-        <span class="icon">📊</span> Reportes
-      </button>
-      <button class="nav-link admin-only" data-module="config">
-        <span class="icon">⚙️</span> Configuración
-      </button>
+      <button class="nav-link admin-only" data-module="workers"><span class="icon">👥</span> Trabajadores</button>
+      <button class="nav-link admin-only" data-module="reports"><span class="icon">📊</span> Reportes</button>
+      <button class="nav-link admin-only" data-module="config"><span class="icon">⚙️</span> Configuración</button>
+
+      <div class="nav-section-label superadmin-only">Catálogos</div>
+      <button class="nav-link superadmin-only" data-module="catalogos"><span class="icon">📋</span> Catálogos</button>
     </nav>
 
-    <!-- Usuario + Tema + Logout -->
     <div class="sidebar-bottom">
       <div class="user-card">
         <div class="user-avatar" id="sidebarAvatar">?</div>
@@ -65,16 +49,12 @@
         <span id="themeIcon">🌙</span>
         <span id="themeLabel">Modo oscuro</span>
       </button>
-      <button class="logout-btn" id="logoutBtn">
-        🚪 Cerrar sesión
-      </button>
+      <button class="logout-btn" id="logoutBtn">🚪 Cerrar sesión</button>
     </div>
   </aside>
 
-  <!-- Overlay móvil -->
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-  <!-- ══ TOPBAR — solo visible en móvil ════════════════════════ -->
   <div class="topbar">
     <div class="topbar-left">
       <button class="hamburger" id="hamburger">☰</button>
@@ -96,55 +76,35 @@
           <div class="page-subtitle" id="dashSubtitle"></div>
         </div>
       </div>
-
-      <!-- KPIs -->
       <div class="kpi-grid">
         <div class="kpi-card">
           <div class="kpi-icon blue">📍</div>
-          <div>
-            <div class="kpi-label">Asistencias hoy</div>
-            <div class="kpi-value" id="kpiAtt">–</div>
-          </div>
+          <div><div class="kpi-label">Asistencias hoy</div><div class="kpi-value" id="kpiAtt">–</div></div>
         </div>
         <div class="kpi-card">
           <div class="kpi-icon yellow">⏳</div>
-          <div>
-            <div class="kpi-label">Reembolsos pendientes</div>
-            <div class="kpi-value" id="kpiPend">–</div>
-          </div>
+          <div><div class="kpi-label">Reembolsos enviados</div><div class="kpi-value" id="kpiPend">–</div></div>
         </div>
         <div class="kpi-card">
           <div class="kpi-icon green">💰</div>
-          <div>
-            <div class="kpi-label">Monto aprobado (mes)</div>
-            <div class="kpi-value" id="kpiMonto">–</div>
-          </div>
+          <div><div class="kpi-label">Monto aprobado (mes)</div><div class="kpi-value" id="kpiMonto">–</div></div>
         </div>
         <div class="kpi-card">
           <div class="kpi-icon cyan">📂</div>
-          <div>
-            <div class="kpi-label">Mis documentos</div>
-            <div class="kpi-value" id="kpiDocs">–</div>
-          </div>
+          <div><div class="kpi-label">Mis documentos</div><div class="kpi-value" id="kpiDocs">–</div></div>
         </div>
       </div>
-
-      <!-- Actividad reciente -->
       <div class="dash-grid">
         <div class="card">
           <h3 style="margin-bottom:12px">📍 Asistencia de hoy</h3>
           <ul class="recent-list" id="dashRecentAtt">
-            <li class="text-muted text-sm" style="padding:12px;text-align:center">
-              <div class="spinner"></div>
-            </li>
+            <li class="text-muted text-sm" style="padding:12px;text-align:center"><div class="spinner"></div></li>
           </ul>
         </div>
         <div class="card">
           <h3 style="margin-bottom:12px">💳 Reembolsos recientes</h3>
           <ul class="recent-list" id="dashRecentRei">
-            <li class="text-muted text-sm" style="padding:12px;text-align:center">
-              <div class="spinner"></div>
-            </li>
+            <li class="text-muted text-sm" style="padding:12px;text-align:center"><div class="spinner"></div></li>
           </ul>
         </div>
       </div>
@@ -158,8 +118,6 @@
           <div class="page-subtitle">Registro de entrada y salida con GPS</div>
         </div>
       </div>
-
-      <!-- GPS + Botones de check-in -->
       <div class="card" style="margin-bottom:16px">
         <div class="gps-status loading" id="gpsStatus">🔄 Iniciando GPS...</div>
         <div class="checkin-grid">
@@ -175,23 +133,13 @@
           </button>
         </div>
       </div>
-
-      <!-- Filtros + Tabla -->
       <div class="card">
         <div class="filters-bar">
-          <div class="filter-group">
-            <label>Desde</label>
-            <input type="date" class="form-input filter-input" id="attFrom"/>
-          </div>
-          <div class="filter-group">
-            <label>Hasta</label>
-            <input type="date" class="form-input filter-input" id="attTo"/>
-          </div>
-          <div class="filter-group admin-only">
+          <div class="filter-group"><label>Desde</label><input type="date" class="form-input filter-input" id="attFrom"/></div>
+          <div class="filter-group"><label>Hasta</label><input type="date" class="form-input filter-input" id="attTo"/></div>
+          <div class="filter-group elevated-only">
             <label>Trabajador</label>
-            <select class="form-select filter-input" id="attWorker">
-              <option value="">Todos</option>
-            </select>
+            <select class="form-select filter-input" id="attWorker"><option value="">Todos</option></select>
           </div>
           <div class="filter-group" style="flex-direction:row;gap:8px;align-items:flex-end">
             <button class="btn btn-primary btn-sm" onclick="Attendance.load()">🔍 Filtrar</button>
@@ -199,26 +147,18 @@
             <a class="btn btn-secondary btn-sm" id="exportAttBtn" href="/api/attendance/export" download>⬇ CSV</a>
           </div>
         </div>
-
         <div class="table-wrapper">
           <table class="table">
             <thead>
               <tr>
                 <th>Fecha</th>
-                <th class="admin-only">Trabajador</th>
-                <th class="admin-only">Tipo</th>
-                <th>Entrada</th>
-                <th>Salida</th>
-                <th>Ubicación</th>
-                <th>Estado</th>
+                <th class="elevated-only">Trabajador</th>
+                <th class="elevated-only">Tipo</th>
+                <th>Entrada</th><th>Salida</th><th>Ubicación</th><th>Estado</th>
               </tr>
             </thead>
             <tbody id="attBody">
-              <tr>
-                <td colspan="7" style="text-align:center;padding:40px">
-                  <div class="spinner"></div>
-                </td>
-              </tr>
+              <tr><td colspan="7" style="text-align:center;padding:40px"><div class="spinner"></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -234,32 +174,24 @@
         </div>
         <button class="btn btn-primary" onclick="Reimbursements.openNew()">+ Nueva solicitud</button>
       </div>
-
       <div class="card">
         <div class="filters-bar">
-          <div class="filter-group">
-            <label>Desde</label>
-            <input type="date" class="form-input filter-input" id="reiFrom"/>
-          </div>
-          <div class="filter-group">
-            <label>Hasta</label>
-            <input type="date" class="form-input filter-input" id="reiTo"/>
-          </div>
+          <div class="filter-group"><label>Desde</label><input type="date" class="form-input filter-input" id="reiFrom"/></div>
+          <div class="filter-group"><label>Hasta</label><input type="date" class="form-input filter-input" id="reiTo"/></div>
           <div class="filter-group">
             <label>Estado</label>
             <select class="form-select filter-input" id="reiStatus">
               <option value="">Todos</option>
-              <option value="pending">Pendiente</option>
-              <option value="approved">Aprobado</option>
-              <option value="rejected">Rechazado</option>
-              <option value="paid">Pagado</option>
+              <option value="enviado">Enviado</option>
+              <option value="en_revision">En revisión</option>
+              <option value="aprobado">Aprobado</option>
+              <option value="rechazado">Rechazado</option>
+              <option value="pagado">Pagado</option>
             </select>
           </div>
           <div class="filter-group admin-only">
             <label>Trabajador</label>
-            <select class="form-select filter-input" id="reiWorker">
-              <option value="">Todos</option>
-            </select>
+            <select class="form-select filter-input" id="reiWorker"><option value="">Todos</option></select>
           </div>
           <div class="filter-group" style="flex-direction:row;gap:8px;align-items:flex-end">
             <button class="btn btn-primary btn-sm" onclick="Reimbursements.load()">🔍 Filtrar</button>
@@ -267,28 +199,23 @@
             <a class="btn btn-secondary btn-sm" id="exportReiBtn" href="/api/reimbursements/export" download>⬇ CSV</a>
           </div>
         </div>
-
         <div class="table-wrapper">
           <table class="table">
             <thead>
               <tr>
                 <th>Fecha</th>
-                <th class="admin-only">Trabajador</th>
-                <th>Concepto</th>
-                <th>Proveedor</th>
-                <th>Comprobante</th>
+                <th class="elevated-only">Trabajador</th>
+                <th>Tipo Gasto</th>
+                <th>Empresa/Obra</th>
+                <th>Descripción</th>
                 <th>Monto</th>
                 <th>Archivos</th>
                 <th>Estado</th>
-                <th class="admin-only">Acciones</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody id="reiBody">
-              <tr>
-                <td colspan="9" style="text-align:center;padding:40px">
-                  <div class="spinner"></div>
-                </td>
-              </tr>
+              <tr><td colspan="9" style="text-align:center;padding:40px"><div class="spinner"></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -304,7 +231,6 @@
         </div>
         <button class="btn btn-primary admin-only" onclick="Documents.openNew()">+ Subir documento</button>
       </div>
-
       <div class="card" style="margin-bottom:16px">
         <div class="filters-bar">
           <div class="filter-group">
@@ -325,9 +251,7 @@
           </div>
           <div class="filter-group admin-only">
             <label>Trabajador</label>
-            <select class="form-select filter-input" id="docWorker">
-              <option value="">Todos</option>
-            </select>
+            <select class="form-select filter-input" id="docWorker"><option value="">Todos</option></select>
           </div>
           <div class="filter-group" style="flex-direction:row;gap:8px;align-items:flex-end">
             <button class="btn btn-primary btn-sm" onclick="Documents.load()">🔍 Filtrar</button>
@@ -335,14 +259,12 @@
           </div>
         </div>
       </div>
-
-      <div id="docsGrid"
-           style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">
+      <div id="docsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">
         <div class="loading-page"><div class="spinner"></div></div>
       </div>
     </section>
 
-    <!-- ─── TRABAJADORES (admin) ───────────────────────────── -->
+    <!-- ─── TRABAJADORES ─────────────────────────────────────── -->
     <section class="module-section" id="module-workers">
       <div class="page-header">
         <div>
@@ -350,19 +272,15 @@
           <div class="page-subtitle">Gestión de usuarios del sistema</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-secondary btn-sm" onclick="Workers.downloadPlantilla()">
-            ⬇ Plantilla
-          </button>
+          <button class="btn btn-secondary btn-sm" onclick="Workers.downloadPlantilla()">⬇ Plantilla</button>
           <button class="btn btn-secondary" onclick="Workers.openImport()">📥 Importar</button>
           <button class="btn btn-primary" onclick="Workers.openNew()">+ Nuevo trabajador</button>
         </div>
       </div>
-
       <div class="card">
         <div style="margin-bottom:14px">
           <input type="search" class="form-input" id="workerSearch"
-                 placeholder="🔍 Buscar por nombre o DNI..."
-                 style="max-width:320px"
+                 placeholder="🔍 Buscar por nombre o DNI..." style="max-width:320px"
                  oninput="Workers.load()"/>
         </div>
         <div class="table-wrapper">
@@ -370,7 +288,8 @@
             <thead>
               <tr>
                 <th>Trabajador</th>
-                <th>Tipo</th>
+                <th>Relación Laboral</th>
+                <th>Cargo</th>
                 <th>Empresa</th>
                 <th>Rol</th>
                 <th>Estado</th>
@@ -378,18 +297,14 @@
               </tr>
             </thead>
             <tbody id="workersBody">
-              <tr>
-                <td colspan="6" style="text-align:center;padding:40px">
-                  <div class="spinner"></div>
-                </td>
-              </tr>
+              <tr><td colspan="7" style="text-align:center;padding:40px"><div class="spinner"></div></td></tr>
             </tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- ─── REPORTES (admin) ──────────────────────────────── -->
+    <!-- ─── REPORTES ─────────────────────────────────────────── -->
     <section class="module-section" id="module-reports">
       <div class="page-header">
         <div>
@@ -397,93 +312,48 @@
           <div class="page-subtitle">Estadísticas y exportación de datos</div>
         </div>
       </div>
-
-      <!-- Filtros -->
       <div class="card" style="margin-bottom:16px">
         <div class="filters-bar">
-          <div class="filter-group">
-            <label>Desde</label>
-            <input type="date" class="form-input filter-input" id="repFrom"/>
-          </div>
-          <div class="filter-group">
-            <label>Hasta</label>
-            <input type="date" class="form-input filter-input" id="repTo"/>
-          </div>
+          <div class="filter-group"><label>Desde</label><input type="date" class="form-input filter-input" id="repFrom"/></div>
+          <div class="filter-group"><label>Hasta</label><input type="date" class="form-input filter-input" id="repTo"/></div>
           <div class="filter-group">
             <label>Estado</label>
             <select class="form-select filter-input" id="repStatus">
               <option value="">Todos</option>
-              <option value="pending">Pendiente</option>
-              <option value="approved">Aprobado</option>
-              <option value="rejected">Rechazado</option>
-              <option value="paid">Pagado</option>
+              <option value="enviado">Enviado</option>
+              <option value="en_revision">En revisión</option>
+              <option value="aprobado">Aprobado</option>
+              <option value="rechazado">Rechazado</option>
+              <option value="pagado">Pagado</option>
             </select>
           </div>
           <div class="filter-group">
             <label>Trabajador</label>
-            <select class="form-select filter-input" id="repWorker">
-              <option value="">Todos</option>
-            </select>
+            <select class="form-select filter-input" id="repWorker"><option value="">Todos</option></select>
           </div>
           <div class="filter-group" style="flex-direction:row;gap:8px;align-items:flex-end">
             <button class="btn btn-primary btn-sm" onclick="Reports.loadStats()">🔍 Actualizar</button>
           </div>
         </div>
       </div>
-
-      <!-- KPIs de reportes -->
       <div class="kpi-grid" style="margin-bottom:24px">
-        <div class="kpi-card">
-          <div class="kpi-icon blue">📍</div>
-          <div>
-            <div class="kpi-label">Registros de asistencia</div>
-            <div class="kpi-value" id="repAtt">–</div>
-          </div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-icon green">👥</div>
-          <div>
-            <div class="kpi-label">Trabajadores únicos</div>
-            <div class="kpi-value" id="repWorkers">–</div>
-          </div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-icon cyan">💰</div>
-          <div>
-            <div class="kpi-label">Total reembolsos</div>
-            <div class="kpi-value" id="repMonto">–</div>
-          </div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-icon yellow">⏳</div>
-          <div>
-            <div class="kpi-label">Pendientes de aprobar</div>
-            <div class="kpi-value" id="repPend">–</div>
-          </div>
-        </div>
+        <div class="kpi-card"><div class="kpi-icon blue">📍</div><div><div class="kpi-label">Registros de asistencia</div><div class="kpi-value" id="repAtt">–</div></div></div>
+        <div class="kpi-card"><div class="kpi-icon green">👥</div><div><div class="kpi-label">Trabajadores únicos</div><div class="kpi-value" id="repWorkers">–</div></div></div>
+        <div class="kpi-card"><div class="kpi-icon cyan">💰</div><div><div class="kpi-label">Total reembolsos</div><div class="kpi-value" id="repMonto">–</div></div></div>
+        <div class="kpi-card"><div class="kpi-icon yellow">⏳</div><div><div class="kpi-label">Enviados / pendientes</div><div class="kpi-value" id="repPend">–</div></div></div>
       </div>
-
-      <!-- Descargas CSV -->
       <div class="card">
         <h3 style="margin-bottom:16px">⬇ Descargar reportes en CSV</h3>
         <div style="display:flex;flex-wrap:wrap;gap:10px">
-          <button class="btn btn-secondary" onclick="Reports.download('attendance')">
-            📍 Asistencia
-          </button>
-          <button class="btn btn-secondary" onclick="Reports.download('reimbursements')">
-            💳 Reembolsos
-          </button>
-          <button class="btn btn-secondary" onclick="Reports.download('documents')">
-            📂 Documentos
-          </button>
-          <button class="btn btn-secondary" onclick="Reports.download('summary')">
-            📊 Resumen general
-          </button>
+          <button class="btn btn-secondary" onclick="Reports.download('attendance')">📍 Asistencia</button>
+          <button class="btn btn-secondary" onclick="Reports.download('reimbursements')">💳 Reembolsos</button>
+          <button class="btn btn-secondary" onclick="Reports.download('documents')">📂 Documentos</button>
+          <button class="btn btn-secondary" onclick="Reports.download('summary')">📊 Resumen general</button>
         </div>
       </div>
     </section>
 
-    <!-- ─── CONFIGURACIÓN (admin) ─────────────────────────── -->
+    <!-- ─── CONFIGURACIÓN ─────────────────────────────────────── -->
     <section class="module-section" id="module-config">
       <div class="page-header">
         <div>
@@ -491,21 +361,13 @@
           <div class="page-subtitle">Sistema, empresas y respaldo de datos</div>
         </div>
       </div>
-
       <div class="dash-grid" style="margin-bottom:16px">
-
-        <!-- Estado del sistema -->
         <div class="card">
           <h3 style="margin-bottom:14px">📊 Estado del sistema</h3>
-          <div id="configStats">
-            <div class="loading-page"><div class="spinner"></div></div>
-          </div>
+          <div id="configStats"><div class="loading-page"><div class="spinner"></div></div></div>
         </div>
-
-        <!-- Backup / Zona de peligro -->
         <div class="card">
           <h3 style="margin-bottom:14px">💾 Respaldo de datos</h3>
-
           <div style="margin-bottom:16px">
             <div class="form-label">Restaurar desde backup (.json)</div>
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px">
@@ -515,96 +377,156 @@
               </label>
               <span class="text-muted text-sm" id="backupFileName"></span>
             </div>
-            <button class="btn btn-primary btn-sm" style="margin-top:10px"
-                    onclick="Config.importBackup()">⬆ Restaurar backup</button>
+            <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="Config.importBackup()">⬆ Restaurar backup</button>
           </div>
-
           <hr style="border:none;border-top:1px solid var(--border);margin:16px 0"/>
-
           <div>
-            <div class="form-label" style="color:var(--danger);margin-bottom:6px">
-              ⚠️ Zona de peligro
-            </div>
-            <button class="btn btn-danger btn-sm" onclick="Config.resetDemo()">
-              🗑 Restaurar datos de demo
-            </button>
-            <div class="form-hint">
-              Borrará todos los datos y restaurará los usuarios de muestra.
-            </div>
+            <div class="form-label" style="color:var(--danger);margin-bottom:6px">⚠️ Zona de peligro</div>
+            <button class="btn btn-danger btn-sm" onclick="Config.resetDemo()">🗑 Restaurar datos de demo</button>
+            <div class="form-hint">Borrará todos los datos y restaurará los usuarios de muestra.</div>
           </div>
         </div>
       </div>
-
-      <!-- Tabla de empresas Drive -->
+      <!-- Potestades de aprobación (solo superadmin) -->
+      <div class="card superadmin-only" style="margin-bottom:16px">
+        <h3 style="margin-bottom:14px">🔐 Potestades de aprobación</h3>
+        <p class="text-muted text-sm" style="margin-bottom:12px">
+          Configura qué roles pueden aprobar/rechazar solicitudes de reembolso. El Super Admin siempre puede aprobar.
+        </p>
+        <div id="potestadesList">
+          <div class="loading-page"><div class="spinner"></div></div>
+        </div>
+      </div>
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
           <h3>🏢 Empresas / Google Drive / OneDrive</h3>
-          <button class="btn btn-primary btn-sm" onclick="Config.addEmpresa()">
-            + Agregar empresa
-          </button>
+          <button class="btn btn-primary btn-sm" onclick="Config.addEmpresa()">+ Agregar empresa</button>
         </div>
         <div class="table-wrapper">
           <table class="table">
             <thead>
-              <tr>
-                <th>Empresa</th>
-                <th>RUC</th>
-                <th>Gmail Drive</th>
-                <th>Ruta OneDrive</th>
-                <th>Acciones</th>
-              </tr>
+              <tr><th>Empresa</th><th>RUC</th><th>Gmail Drive</th><th>Ruta OneDrive</th><th>Acciones</th></tr>
             </thead>
             <tbody id="driveBody">
-              <tr>
-                <td colspan="5" class="text-muted" style="text-align:center;padding:20px">
-                  Cargando...
-                </td>
-              </tr>
+              <tr><td colspan="5" class="text-muted" style="text-align:center;padding:20px">Cargando...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
     </section>
 
-  </main><!-- /main-content -->
+    <!-- ─── CATÁLOGOS (superadmin) ────────────────────────────── -->
+    <section class="module-section" id="module-catalogos">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📋 Catálogos</div>
+          <div class="page-subtitle">Gestión de datos de referencia del sistema</div>
+        </div>
+        <button class="btn btn-primary" onclick="Catalogos.openNew(Catalogos.currentTab)">+ Agregar ítem</button>
+      </div>
 
-</div><!-- /app-wrapper -->
+      <!-- Tabs de catálogos -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <button class="catalog-tab btn btn-secondary active" data-tab="catalogo_empresas"
+                onclick="Catalogos.switchTab('catalogo_empresas')">🏢 Empresas/Obras</button>
+        <button class="catalog-tab btn btn-secondary" data-tab="catalogo_vehiculos"
+                onclick="Catalogos.switchTab('catalogo_vehiculos')">🚗 Vehículos</button>
+        <button class="catalog-tab btn btn-secondary" data-tab="catalogo_descripciones"
+                onclick="Catalogos.switchTab('catalogo_descripciones')">📋 Descripciones</button>
+        <button class="catalog-tab btn btn-secondary" data-tab="catalogo_motivos"
+                onclick="Catalogos.switchTab('catalogo_motivos')">📌 Motivos</button>
+      </div>
+
+      <div class="card">
+        <div id="catalogTableContainer">
+          <div class="loading-page"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
 
 
 <!-- ══ MODALES ════════════════════════════════════════════════ -->
 
-<!-- Modal: Nueva solicitud de reembolso -->
+<!-- Modal: Nueva / Editar solicitud de reembolso -->
 <div class="modal-overlay" id="modalReembolso">
-  <div class="modal">
+  <div class="modal modal-lg">
     <div class="modal-header">
-      <div class="modal-title">💳 Nueva solicitud de reembolso</div>
+      <div class="modal-title" id="modalReembolsoTitle">💳 Nueva solicitud de reembolso</div>
       <button class="modal-close" onclick="closeModal('modalReembolso')">✕</button>
     </div>
     <div class="modal-body">
-      <div class="form-grid-2">
-        <div class="form-group">
-          <label class="form-label">Concepto <span class="required">*</span></label>
-          <input type="text" class="form-input" id="rConcepto"
-                 placeholder="Ej: Pasajes, almuerzo de trabajo..."/>
+
+      <!-- 1. Tipo de gasto -->
+      <div class="form-group">
+        <label class="form-label">Tipo de gasto <span class="required">*</span></label>
+        <input type="hidden" id="rTipoGastoHidden"/>
+        <div class="tipo-gasto-grid">
+          <div class="tipo-gasto-card" data-tipo="transporte" onclick="Reimbursements.onTipoGasto('transporte')">
+            <div style="font-size:1.6rem">🚗</div>
+            <div style="font-weight:600;font-size:0.85rem">Transporte</div>
+          </div>
+          <div class="tipo-gasto-card" data-tipo="viaticos" onclick="Reimbursements.onTipoGasto('viaticos')">
+            <div style="font-size:1.6rem">🍽</div>
+            <div style="font-weight:600;font-size:0.85rem">Viáticos</div>
+          </div>
+          <div class="tipo-gasto-card" data-tipo="compras" onclick="Reimbursements.onTipoGasto('compras')">
+            <div style="font-size:1.6rem">🛒</div>
+            <div style="font-weight:600;font-size:0.85rem">Compras</div>
+          </div>
         </div>
+      </div>
+
+      <!-- 2. Empresa / Obra -->
+      <div class="form-group">
+        <label class="form-label">Empresa / Obra <span class="required">*</span></label>
+        <select class="form-select" id="rEmpresaObra">
+          <option value="">Seleccionar empresa/obra...</option>
+        </select>
+      </div>
+
+      <!-- 3. Motivo / Actividad -->
+      <div class="form-group">
+        <label class="form-label">Motivo / Actividad <span class="required">*</span></label>
+        <select class="form-select" id="rMotivo" onchange="Reimbursements.onMotivoChange()">
+          <option value="">Seleccionar motivo...</option>
+        </select>
+      </div>
+      <div class="form-group" id="rMotivoLibreGroup" style="display:none">
+        <label class="form-label">Especificar motivo</label>
+        <input type="text" class="form-input" id="rMotivoLibre" placeholder="Describe el motivo..."/>
+      </div>
+
+      <!-- 4. Descripción -->
+      <div class="form-group">
+        <label class="form-label">Descripción <span class="required">*</span></label>
+        <select class="form-select" id="rDescripcion" onchange="Reimbursements.onDescripcionChange()">
+          <option value="">Primero selecciona el tipo de gasto</option>
+        </select>
+      </div>
+      <div class="form-group" id="rDescripcionLibreGroup" style="display:none">
+        <label class="form-label">Especificar descripción</label>
+        <input type="text" class="form-input" id="rDescripcionLibre" placeholder="Describe el gasto..."/>
+      </div>
+
+      <!-- 5. Vehículo (condicional) -->
+      <div class="form-group" id="rVehiculoGroup" style="display:none">
+        <label class="form-label">Vehículo de empresa</label>
+        <select class="form-select" id="rVehiculo">
+          <option value="">Seleccionar vehículo...</option>
+        </select>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:12px 0"/>
+
+      <!-- 6. Monto -->
+      <div class="form-grid-2">
         <div class="form-group">
           <label class="form-label">Monto (S/) <span class="required">*</span></label>
-          <input type="number" class="form-input" id="rMonto"
-                 step="0.01" min="0" placeholder="0.00"/>
+          <input type="number" class="form-input" id="rMonto" step="0.01" min="0" placeholder="0.00"/>
         </div>
-      </div>
-      <div class="form-grid-2">
-        <div class="form-group">
-          <label class="form-label">RUC del proveedor</label>
-          <input type="text" class="form-input" id="rRuc" placeholder="20XXXXXXXXX"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Nombre del proveedor</label>
-          <input type="text" class="form-input" id="rProveedor"
-                 placeholder="Nombre o razón social"/>
-        </div>
-      </div>
-      <div class="form-grid-2">
         <div class="form-group">
           <label class="form-label">Tipo de comprobante</label>
           <select class="form-select" id="rTipoDoc">
@@ -612,19 +534,58 @@
             <option value="Factura">Factura</option>
             <option value="Boleta">Boleta de venta</option>
             <option value="Ticket">Ticket / Recibo</option>
+            <option value="Recibo">Recibo</option>
             <option value="Otro">Otro</option>
           </select>
         </div>
+      </div>
+      <div class="form-grid-2">
         <div class="form-group">
           <label class="form-label">N° de documento</label>
           <input type="text" class="form-input" id="rNumDoc" placeholder="F001-00001"/>
         </div>
+        <div class="form-group">
+          <label class="form-label">RUC del proveedor</label>
+          <input type="text" class="form-input" id="rRuc" placeholder="20XXXXXXXXX"/>
+        </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Notas adicionales</label>
-        <textarea class="form-textarea" id="rNotas"
-                  placeholder="Descripción o detalle adicional..."></textarea>
+        <label class="form-label">Nombre del proveedor</label>
+        <input type="text" class="form-input" id="rProveedor" placeholder="Nombre o razón social"/>
       </div>
+
+      <!-- 11. Medio de pago -->
+      <div class="form-group">
+        <label class="form-label">Medio de pago</label>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:6px">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+            <input type="radio" name="rMedioPago" value="banco_transferencia" onchange="Reimbursements.onMedioPagoChange()"/>
+            <span>🏦 Banco / Transferencia</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+            <input type="radio" name="rMedioPago" value="yape" onchange="Reimbursements.onMedioPagoChange()"/>
+            <span>📱 Yape</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+            <input type="radio" name="rMedioPago" value="plin" onchange="Reimbursements.onMedioPagoChange()"/>
+            <span>📱 Plin</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 12. N° de operación (condicional) -->
+      <div class="form-group" id="rNumOperacionGroup" style="display:none">
+        <label class="form-label">N° de operación</label>
+        <input type="text" class="form-input" id="rNumOperacion" placeholder="N° de transferencia / operación"/>
+      </div>
+
+      <!-- Notas -->
+      <div class="form-group">
+        <label class="form-label">Notas adicionales</label>
+        <textarea class="form-textarea" id="rNotas" placeholder="Descripción o detalle adicional..."></textarea>
+      </div>
+
+      <!-- 13. Comprobantes -->
       <div class="form-group">
         <label class="form-label">Comprobantes (máx. 5 archivos)</label>
         <div class="upload-zone" id="rUploadZone">
@@ -640,11 +601,33 @@
         </div>
         <div id="rFilePreview"></div>
       </div>
+
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modalReembolso')">Cancelar</button>
-      <button class="btn btn-primary" id="btnSaveReembolso"
-              onclick="Reimbursements.save()">Enviar solicitud</button>
+      <button class="btn btn-primary" id="btnSaveReembolso" onclick="Reimbursements.save()">Enviar solicitud</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Motivo de rechazo -->
+<div class="modal-overlay" id="modalRechazo">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div class="modal-title">✗ Rechazar solicitud</div>
+      <button class="modal-close" onclick="closeModal('modalRechazo')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="rejectReimId"/>
+      <div class="form-group">
+        <label class="form-label">Motivo de rechazo <span class="required">*</span></label>
+        <textarea class="form-textarea" id="rejectMotivo"
+                  placeholder="Explica por qué se rechaza esta solicitud..." rows="4"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalRechazo')">Cancelar</button>
+      <button class="btn btn-danger" onclick="Reimbursements.confirmReject()">✗ Confirmar rechazo</button>
     </div>
   </div>
 </div>
@@ -659,9 +642,7 @@
     <div class="modal-body">
       <div class="form-group">
         <label class="form-label">Trabajador <span class="required">*</span></label>
-        <select class="form-select" id="dWorker">
-          <option value="">Seleccionar trabajador...</option>
-        </select>
+        <select class="form-select" id="dWorker"><option value="">Seleccionar trabajador...</option></select>
       </div>
       <div class="form-grid-2">
         <div class="form-group">
@@ -686,8 +667,7 @@
       </div>
       <div class="form-group">
         <label class="form-label">Título <span class="required">*</span></label>
-        <input type="text" class="form-input" id="dTitulo"
-               placeholder="Ej: Boleta Enero 2025"/>
+        <input type="text" class="form-input" id="dTitulo" placeholder="Ej: Boleta Enero 2025"/>
       </div>
       <div class="form-group">
         <label class="form-label">Archivo <span class="required">*</span></label>
@@ -697,10 +677,8 @@
             Arrastra el archivo aquí o
             <label style="cursor:pointer;display:inline">
               <strong>selecciona</strong>
-              <input type="file" id="dFile"
-                     accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
-                     style="display:none"
-                     onchange="Documents.onFileSelect(this)"/>
+              <input type="file" id="dFile" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
+                     style="display:none" onchange="Documents.onFileSelect(this)"/>
             </label>
           </div>
         </div>
@@ -709,8 +687,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modalDocumento')">Cancelar</button>
-      <button class="btn btn-primary" id="btnSaveDoc"
-              onclick="Documents.save()">Subir documento</button>
+      <button class="btn btn-primary" id="btnSaveDoc" onclick="Documents.save()">Subir documento</button>
     </div>
   </div>
 </div>
@@ -727,13 +704,11 @@
       <div class="form-grid-2">
         <div class="form-group">
           <label class="form-label">DNI <span class="required">*</span></label>
-          <input type="text" class="form-input" id="wDni"
-                 maxlength="8" inputmode="numeric" placeholder="8 dígitos"/>
+          <input type="text" class="form-input" id="wDni" maxlength="8" inputmode="numeric" placeholder="8 dígitos"/>
         </div>
         <div class="form-group">
           <label class="form-label">Nombre completo <span class="required">*</span></label>
-          <input type="text" class="form-input" id="wNombre"
-                 placeholder="Apellidos y nombres"/>
+          <input type="text" class="form-input" id="wNombre" placeholder="Apellidos y nombres"/>
         </div>
       </div>
       <div class="form-group">
@@ -745,23 +720,37 @@
         <div class="form-group">
           <label class="form-label">Rol</label>
           <select class="form-select" id="wRol">
-            <option value="worker">Trabajador</option>
-            <option value="admin">Administrador</option>
+            <option value="trabajador">👷 Trabajador</option>
+            <option value="supervisor">👁 Supervisor</option>
+            <option value="gerente">📋 Gerente</option>
+            <option value="administrador">🛡 Administrador</option>
+            <option value="superadministrador">⭐ Super Admin</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Tipo</label>
-          <select class="form-select" id="wTipo">
-            <option value="planilla">Planilla</option>
-            <option value="externo">Externo (RH)</option>
+          <label class="form-label">Tipo de relación laboral</label>
+          <select class="form-select" id="wTipoRel" onchange="Workers._toggleEmpresaPrincipal()">
+            <option value="planilla_jvn">Planilla JVÑ</option>
+            <option value="planilla_peval">Planilla PEVAL</option>
+            <option value="independiente_rh">Externo (RH)</option>
           </select>
         </div>
       </div>
-      <div class="form-grid-2">
+      <div class="form-group">
+        <label class="form-label">Cargo / Función</label>
+        <select class="form-select" id="wCargo">
+          <option value="">Sin especificar</option>
+          <option value="tecnico_auxiliar">Técnico Auxiliar</option>
+          <option value="tecnico_instalador">Técnico Instalador</option>
+          <option value="administracion">Administración</option>
+          <option value="supervisor">Supervisor</option>
+          <option value="chofer">Chofer</option>
+        </select>
+      </div>
+      <div class="form-grid-2" id="wEmpresaGroup">
         <div class="form-group">
           <label class="form-label">Empresa</label>
-          <input type="text" class="form-input" id="wEmpresa"
-                 placeholder="Nombre de la empresa"/>
+          <input type="text" class="form-input" id="wEmpresa" placeholder="Nombre de la empresa"/>
         </div>
         <div class="form-group">
           <label class="form-label">RUC</label>
@@ -771,8 +760,7 @@
       <div class="form-grid-2">
         <div class="form-group">
           <label class="form-label">Email</label>
-          <input type="email" class="form-input" id="wEmail"
-                 placeholder="correo@empresa.com"/>
+          <input type="email" class="form-input" id="wEmail" placeholder="correo@empresa.com"/>
         </div>
         <div class="form-group">
           <label class="form-label">Teléfono</label>
@@ -782,8 +770,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modalWorker')">Cancelar</button>
-      <button class="btn btn-primary" id="btnSaveWorker"
-              onclick="Workers.save()">Guardar</button>
+      <button class="btn btn-primary" id="btnSaveWorker" onclick="Workers.save()">Guardar</button>
     </div>
   </div>
 </div>
@@ -798,14 +785,13 @@
     <div class="modal-body">
       <div class="alert alert-info" style="margin-bottom:16px">
         ℹ️ El archivo debe tener columnas: <strong>DNI</strong>, <strong>Nombre</strong>.
-        Opcionales: Empresa, RUC, Tipo, Email, Teléfono.
-        La contraseña inicial de cada trabajador será su propio DNI.
+        Opcionales: Empresa, RUC, TipoRelacion, Email, Teléfono.
+        La contraseña inicial será el DNI del trabajador.
       </div>
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
         <label class="btn btn-secondary" style="cursor:pointer">
           📁 Seleccionar archivo (.xlsx / .csv)
-          <input type="file" accept=".xlsx,.xls,.csv" style="display:none"
-                 onchange="Workers.onImportFile(this)"/>
+          <input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="Workers.onImportFile(this)"/>
         </label>
         <span class="text-muted text-sm" id="importFileName"></span>
       </div>
@@ -813,22 +799,59 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modalImportWorkers')">Cancelar</button>
-      <button class="btn btn-primary" id="btnExecuteImport"
-              onclick="Workers.executeImport()">Importar trabajadores</button>
+      <button class="btn btn-primary" id="btnExecuteImport" onclick="Workers.executeImport()">Importar trabajadores</button>
     </div>
   </div>
 </div>
 
+<!-- Modal: Agregar / Editar ítem de catálogo -->
+<div class="modal-overlay" id="modalCatalogo">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title" id="modalCatalogoTitle">Agregar ítem</div>
+      <button class="modal-close" onclick="closeModal('modalCatalogo')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="catalogoTable"/>
+      <div class="form-group">
+        <label class="form-label">Nombre <span class="required">*</span></label>
+        <input type="text" class="form-input" id="catalogoNombre" placeholder="Nombre del ítem"/>
+      </div>
+      <div class="form-group" id="catalogoTipoGastoGroup" style="display:none">
+        <label class="form-label">Tipo de gasto <span class="required">*</span></label>
+        <select class="form-select" id="catalogoTipoGasto">
+          <option value="">Seleccionar...</option>
+          <option value="transporte">🚗 Transporte</option>
+          <option value="viaticos">🍽 Viáticos</option>
+          <option value="compras">🛒 Compras</option>
+        </select>
+      </div>
+      <div class="form-group" id="catalogoCodigoGroup">
+        <label class="form-label">Código (opcional)</label>
+        <input type="text" class="form-input" id="catalogoCodigo" placeholder="Código corto"/>
+      </div>
+      <div class="form-group" id="catalogoPlacaGroup" style="display:none">
+        <label class="form-label">Placa (opcional)</label>
+        <input type="text" class="form-input" id="catalogoPlaca" placeholder="ABC-123"/>
+      </div>
+      <div class="form-group" id="catalogoOrdenGroup">
+        <label class="form-label">Orden de visualización</label>
+        <input type="number" class="form-input" id="catalogoOrden" value="0" min="0"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalCatalogo')">Cancelar</button>
+      <button class="btn btn-primary" id="btnSaveCatalogo" onclick="Catalogos.saveCatalogo()">Guardar</button>
+    </div>
+  </div>
+</div>
 
 <!-- ══ TOAST ══════════════════════════════════════════════════ -->
 <div class="toast-container" id="toastContainer"></div>
 
 
 <!-- ══ SCRIPTS ════════════════════════════════════════════════ -->
-<!-- SheetJS para importar Excel -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-
-<!-- Módulos NEXORA (orden importante: app primero, luego módulos) -->
 <script src="/js/app.js"></script>
 <script src="/js/auth.js"></script>
 <script src="/js/dashboard.js"></script>
@@ -838,6 +861,7 @@
 <script src="/js/workers.js"></script>
 <script src="/js/reports.js"></script>
 <script src="/js/config.js"></script>
+<script src="/js/catalogos.js"></script>
 
 </body>
 </html>

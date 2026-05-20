@@ -1,5 +1,5 @@
 // ============================================================
-//  NEXORA — workers.js
+//  NEXORA — workers.js  (v3)
 // ============================================================
 'use strict';
 
@@ -7,7 +7,7 @@ const Workers = {
   async load() {
     const search = document.getElementById('workerSearch')?.value.trim().toLowerCase() || '';
     const tbody  = document.getElementById('workersBody');
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px"><div class="spinner"></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px"><div class="spinner"></div></td></tr>`;
 
     try {
       let data = await api('/users/list?all=1');
@@ -16,9 +16,8 @@ const Workers = {
           w.nombre.toLowerCase().includes(search) || w.dni.includes(search)
         );
       }
-
       if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-muted" style="text-align:center;padding:40px">Sin trabajadores encontrados</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-muted" style="text-align:center;padding:40px">Sin trabajadores encontrados</td></tr>`;
         return;
       }
 
@@ -35,15 +34,12 @@ const Workers = {
               </div>
             </div>
           </td>
+          <td class="text-sm">${Workers._tipoRelLabel(w.tipo_relacion)}</td>
+          <td class="text-sm">${Workers._cargoLabel(w.cargo)}</td>
+          <td class="text-sm">${w.empresa || '–'}</td>
           <td>
-            <span class="badge ${w.tipo === 'externo' ? 'badge-gray' : 'badge-primary'}">
-              ${w.tipo === 'externo' ? '📋 Externo (RH)' : '👷 Planilla'}
-            </span>
-          </td>
-          <td class="text-sm">${w.empresa || '–'}${w.ruc ? '<br><span class="text-muted">RUC: '+w.ruc+'</span>' : ''}</td>
-          <td>
-            <span class="badge ${w.rol === 'admin' ? 'badge-warning' : 'badge-gray'}">
-              ${w.rol === 'admin' ? '🛡 Admin' : 'Trabajador'}
+            <span class="badge ${Workers._rolBadge(w.rol)}">
+              ${App._rolLabel(w.rol)}
             </span>
           </td>
           <td>${w.activo
@@ -64,8 +60,21 @@ const Workers = {
         </tr>
       `).join('');
     } catch(e) {
-      tbody.innerHTML = `<tr><td colspan="6" class="text-danger" style="text-align:center;padding:20px">Error: ${e.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" class="text-danger" style="text-align:center;padding:20px">Error: ${e.message}</td></tr>`;
     }
+  },
+
+  _tipoRelLabel(t) {
+    const map = { planilla_jvn:'👷 Planilla JVÑ', planilla_peval:'👷 Planilla PEVAL', independiente_rh:'📋 Externo (RH)' };
+    return map[t] || t || '–';
+  },
+  _cargoLabel(c) {
+    const map = { tecnico_auxiliar:'Técnico Auxiliar', tecnico_instalador:'Técnico Instalador', administracion:'Administración', supervisor:'Supervisor', chofer:'Chofer' };
+    return map[c] || c || '–';
+  },
+  _rolBadge(rol) {
+    const map = { trabajador:'badge-gray', supervisor:'badge-blue', gerente:'badge-primary', administrador:'badge-warning', superadministrador:'badge-teal' };
+    return map[rol] || 'badge-gray';
   },
 
   openNew() {
@@ -74,10 +83,12 @@ const Workers = {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
-    document.getElementById('wRol').value  = 'worker';
-    document.getElementById('wTipo').value = 'planilla';
+    document.getElementById('wRol').value      = 'trabajador';
+    document.getElementById('wTipoRel').value  = 'planilla_jvn';
+    document.getElementById('wCargo').value    = '';
     document.getElementById('wDni').removeAttribute('disabled');
     document.getElementById('wPasswordHelp').textContent = 'Obligatoria para nuevo trabajador';
+    Workers._toggleEmpresaPrincipal();
     openModal('modalWorker');
   },
 
@@ -94,16 +105,22 @@ const Workers = {
       document.getElementById('wNombre').value   = w.nombre;
       document.getElementById('wPassword').value = '';
       document.getElementById('wPasswordHelp').textContent = 'Dejar vacío para no cambiar la contraseña';
-      document.getElementById('wRol').value      = w.rol || 'worker';
-      document.getElementById('wTipo').value     = w.tipo || 'planilla';
+      document.getElementById('wRol').value      = w.rol || 'trabajador';
+      document.getElementById('wTipoRel').value  = w.tipo_relacion || 'planilla_jvn';
+      document.getElementById('wCargo').value    = w.cargo || '';
       document.getElementById('wEmpresa').value  = w.empresa || '';
       document.getElementById('wRuc').value      = w.ruc || '';
       document.getElementById('wEmail').value    = w.email || '';
       document.getElementById('wTelefono').value = w.telefono || '';
+      Workers._toggleEmpresaPrincipal();
       openModal('modalWorker');
-    } catch(e) {
-      toast(e.message, 'error');
-    }
+    } catch(e) { toast(e.message, 'error'); }
+  },
+
+  _toggleEmpresaPrincipal() {
+    const tipo = document.getElementById('wTipoRel').value;
+    const group = document.getElementById('wEmpresaGroup');
+    if (group) group.style.display = (tipo === 'planilla_jvn' || tipo === 'planilla_peval') ? '' : 'none';
   },
 
   async save() {
@@ -119,12 +136,13 @@ const Workers = {
 
     const body = {
       nombre,
-      rol:      document.getElementById('wRol').value,
-      tipo:     document.getElementById('wTipo').value,
-      empresa:  document.getElementById('wEmpresa').value || '',
-      ruc:      document.getElementById('wRuc').value || '',
-      email:    document.getElementById('wEmail').value || '',
-      telefono: document.getElementById('wTelefono').value || '',
+      rol:          document.getElementById('wRol').value,
+      tipo_relacion:document.getElementById('wTipoRel').value,
+      cargo:        document.getElementById('wCargo').value,
+      empresa:      document.getElementById('wEmpresa').value || '',
+      ruc:          document.getElementById('wRuc').value || '',
+      email:        document.getElementById('wEmail').value || '',
+      telefono:     document.getElementById('wTelefono').value || '',
     };
     if (!id) body.dni = dni;
     if (pass) body.password = pass;
@@ -139,7 +157,7 @@ const Workers = {
         toast('✅ Trabajador actualizado', 'success');
       } else {
         await api('/workers', { method: 'POST', body });
-        toast(`✅ Trabajador creado. Contraseña inicial: ${pass}`, 'success');
+        toast(`✅ Trabajador creado. Contraseña: ${pass}`, 'success');
       }
       closeModal('modalWorker');
       Workers.load();
@@ -160,56 +178,41 @@ const Workers = {
       toast(`Trabajador ${currentActive ? 'desactivado' : 'activado'}`, 'success');
       Workers.load();
       App.loadWorkerSelects();
-    } catch(e) {
-      toast(e.message, 'error');
-    }
+    } catch(e) { toast(e.message, 'error'); }
   },
 
   async delete(id, nombre) {
-    if (!confirm(`⚠️ ¿Eliminar a "${nombre}" permanentemente?\n\nEsto también eliminará todos sus registros de asistencia, reembolsos y documentos.\n\nEsta acción NO se puede deshacer.`)) return;
+    if (!confirm(`⚠️ ¿Eliminar a "${nombre}" permanentemente?\n\nEsto también eliminará todos sus registros.\n\nEsta acción NO se puede deshacer.`)) return;
     if (!confirm(`Segunda confirmación: ¿Seguro que deseas eliminar a "${nombre}"?`)) return;
     try {
       await api(`/workers/${id}`, { method: 'DELETE' });
       toast(`✅ Trabajador "${nombre}" eliminado`, 'success');
       Workers.load();
       App.loadWorkerSelects();
-    } catch(e) {
-      toast(e.message, 'error');
-    }
+    } catch(e) { toast(e.message, 'error'); }
   },
 
-  // ── Importar desde Excel / CSV ──────────────────────────────
-  openImport() {
-    openModal('modalImportWorkers');
-  },
+  openImport() { openModal('modalImportWorkers'); },
 
   onImportFile(input) {
     const file = input.files?.[0];
     if (!file) return;
     document.getElementById('importFileName').textContent = file.name;
-
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
         const XLSX = window.XLSX;
-        if (!XLSX) {
-          toast('Cargando lector de Excel...', 'info');
-          return;
-        }
+        if (!XLSX) { toast('Cargando lector de Excel...', 'info'); return; }
         const wb   = XLSX.read(e.target.result, { type: 'binary' });
         const ws   = wb.Sheets[wb.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
-
         Workers._previewImport(rows);
-      } catch(err) {
-        toast('Error al leer el archivo: ' + err.message, 'error');
-      }
+      } catch(err) { toast('Error al leer el archivo: ' + err.message, 'error'); }
     };
     reader.readAsBinaryString(file);
   },
 
   _previewImport(rows) {
-    // Mapear columnas comunes en español e inglés
     const normalizar = (obj) => {
       const get = (...keys) => {
         for (const k of keys) {
@@ -219,27 +222,21 @@ const Workers = {
         return '';
       };
       return {
-        dni:      get('dni','doc','documento','numerodedocumento'),
-        nombre:   get('nombre','name','nombres','nombreyapellidos','apellidosynombres'),
-        empresa:  get('empresa','company','razon','razonsocial'),
-        ruc:      get('ruc','rucdeltrabajador','rucempresa'),
-        tipo:     get('tipo','tipotrabajador','modalidad'),
-        email:    get('email','correo','correoelectronico'),
-        telefono: get('telefono','celular','phone','tel'),
+        dni: get('dni','doc','documento'), nombre: get('nombre','name','nombres'),
+        empresa: get('empresa','company'), ruc: get('ruc'),
+        tipo_relacion: get('tiporelacion','tipo','modalidad'), email: get('email','correo'),
+        telefono: get('telefono','celular','phone'),
       };
     };
-
     const preview = rows.slice(0,100).map(normalizar).filter(r => r.dni || r.nombre);
     Workers._importRows = preview;
-
     const div = document.getElementById('importPreview');
     if (preview.length === 0) {
-      div.innerHTML = '<p class="text-danger">No se encontraron filas válidas. Verifica que el archivo tenga columnas: DNI, Nombre.</p>';
+      div.innerHTML = '<p class="text-danger">No se encontraron filas válidas.</p>';
       return;
     }
-
     div.innerHTML = `
-      <p class="text-muted text-sm mb-8">Se encontraron <strong>${preview.length}</strong> trabajadores. Contraseña inicial = su DNI (pueden cambiarla después).</p>
+      <p class="text-muted text-sm mb-8">Se encontraron <strong>${preview.length}</strong> trabajadores. Contraseña inicial = su DNI.</p>
       <div class="table-wrapper">
         <table class="table">
           <thead><tr><th>DNI</th><th>Nombre</th><th>Empresa</th><th>Tipo</th></tr></thead>
@@ -249,7 +246,7 @@ const Workers = {
                 <td>${r.dni || '<span class="text-danger">falta</span>'}</td>
                 <td>${r.nombre || '<span class="text-danger">falta</span>'}</td>
                 <td>${r.empresa || '–'}</td>
-                <td>${r.tipo || 'planilla'}</td>
+                <td>${r.tipo_relacion || 'planilla_jvn'}</td>
               </tr>
             `).join('')}
             ${preview.length > 10 ? `<tr><td colspan="4" class="text-muted text-sm" style="text-align:center">... y ${preview.length-10} más</td></tr>` : ''}
@@ -261,47 +258,31 @@ const Workers = {
 
   async executeImport() {
     const rows = Workers._importRows;
-    if (!rows || rows.length === 0) {
-      toast('Primero selecciona un archivo válido', 'error');
-      return;
-    }
-
+    if (!rows || rows.length === 0) { toast('Primero selecciona un archivo válido', 'error'); return; }
     const btn = document.getElementById('btnExecuteImport');
     btn.disabled = true;
     btn.textContent = 'Importando...';
-
     try {
-      const result = await api('/workers/import', {
-        method: 'POST',
-        body: { trabajadores: rows }
-      });
-
+      const result = await api('/workers/import', { method: 'POST', body: { trabajadores: rows } });
       closeModal('modalImportWorkers');
       let msg = `✅ ${result.creados} trabajador(es) creado(s) con contraseña = su DNI.`;
-      if (result.errores?.length > 0) msg += `\n⚠️ ${result.errores.length} con error: ${result.errores.slice(0,2).join(', ')}`;
+      if (result.errores?.length > 0) msg += `\n⚠️ ${result.errores.length} con error.`;
       toast(msg, result.creados > 0 ? 'success' : 'error');
       Workers.load();
       App.loadWorkerSelects();
-    } catch(e) {
-      toast(e.message, 'error');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Importar trabajadores';
-    }
+    } catch(e) { toast(e.message, 'error'); }
+    finally { btn.disabled = false; btn.textContent = 'Importar trabajadores'; }
   },
 
   downloadPlantilla() {
-    // Generar CSV de plantilla
-    const bom = '\uFEFF';
-    const csv = bom + 'DNI,Nombre,Empresa,RUC,Tipo,Email,Telefono\n' +
-      '12345678,Juan Pérez García,JVÑ General Services SAC,20603607342,planilla,juan@empresa.com,999888777\n' +
-      '87654321,María López Torres,PEVAL Corporación EIRL,20611965479,externo,maria@email.com,\n';
+    const bom = '﻿';
+    const csv = bom + 'DNI,Nombre,Empresa,RUC,TipoRelacion,Email,Telefono\n' +
+      '12345678,Juan Pérez García,JVÑ General Services SAC,20603607342,planilla_jvn,juan@empresa.com,999888777\n' +
+      '87654321,María López Torres,PEVAL Corporación EIRL,20611965479,planilla_peval,maria@email.com,\n';
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url;
-    a.download = 'plantilla_trabajadores.csv';
-    a.click();
+    const a = document.createElement('a');
+    a.href = url; a.download = 'plantilla_trabajadores.csv'; a.click();
     URL.revokeObjectURL(url);
     toast('📥 Plantilla descargada', 'success');
   }

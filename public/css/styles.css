@@ -770,3 +770,110 @@ a  { color: var(--primary); text-decoration: none; }
   .sidebar, .topbar, .filters-bar, .btn { display: none; }
   .main-content { margin-left: 0; padding: 0; }
 }
+
+/* ─── Badges adicionales (v3) ────────────────────────────────── */
+.badge-teal {
+  background: #ccfbf1; color: #0d9488;
+}
+[data-theme="dark"] .badge-teal {
+  background: #134e4a; color: #2dd4bf;
+}
+.badge-blue {
+  background: #dbeafe; color: #2563eb;
+}
+[data-theme="dark"] .badge-blue {
+  background: #1e3a5f; color: #60a5fa;
+}
+
+/* ─── Tipo-gasto cards ───────────────────────────────────────── */
+.tipo-gasto-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  margin-bottom: 4px;
+}
+.tipo-gasto-card {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px; padding: 14px 10px;
+  border: 2px solid var(--border); border-radius: var(--radius);
+  background: var(--bg-input); cursor: pointer;
+  transition: all 0.15s; text-align: center;
+  font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);
+  user-select: none;
+}
+.tipo-gasto-card .tg-icon { font-size: 1.5rem; }
+.tipo-gasto-card:hover {
+  border-color: var(--primary); background: var(--primary-light);
+  color: var(--primary);
+}
+.tipo-gasto-card.selected {
+  border-color: var(--primary); background: var(--primary-light);
+  color: var(--primary); font-weight: 700;
+}
+@media (max-width: 480px) {
+  .tipo-gasto-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── Catalog tabs ───────────────────────────────────────────── */
+.catalog-tabs {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px;
+}
+.catalog-tab {
+  padding: 7px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card); color: var(--text-secondary);
+  font-size: 0.82rem; font-weight: 500; cursor: pointer;
+  transition: all 0.15s; font-family: inherit;
+}
+.catalog-tab:hover {
+  border-color: var(--primary); color: var(--primary);
+  background: var(--primary-light);
+}
+.catalog-tab.active {
+  background: var(--primary); color: #fff; border-color: var(--primary);
+}
+
+/* ─── Toggle switch (potestades) ─────────────────────────────── */
+.toggle-switch {
+  position: relative; display: inline-block;
+  width: 44px; height: 24px; flex-shrink: 0;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--border); border-radius: 24px;
+  transition: all 0.25s;
+}
+.toggle-slider::before {
+  content: ''; position: absolute;
+  height: 18px; width: 18px;
+  left: 3px; bottom: 3px;
+  background: #fff; border-radius: 50%;
+  transition: transform 0.25s;
+}
+.toggle-switch input:checked + .toggle-slider {
+  background: var(--success);
+}
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(20px);
+}
+.toggle-switch input:focus + .toggle-slider {
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+}
+
+/* ─── Medio pago radio group ─────────────────────────────────── */
+.radio-group {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.radio-option {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 12px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg-input); cursor: pointer;
+  font-size: 0.82rem; color: var(--text-secondary);
+  transition: all 0.15s; user-select: none;
+}
+.radio-option input[type="radio"] { accent-color: var(--primary); }
+.radio-option:has(input:checked) {
+  border-color: var(--primary); background: var(--primary-light);
+  color: var(--primary); font-weight: 600;
+}
