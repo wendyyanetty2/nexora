@@ -61,38 +61,32 @@ const App = {
   },
 
   applyRoleVisibility() {
+    // Helper: restaura el display correcto según tipo de elemento
+    // IMPORTANTE: usar valores explícitos (no '') para sobreescribir .admin-only { display:none }
+    const showEl = (el) => {
+      if (el.tagName === 'TH' || el.tagName === 'TD')      el.style.display = 'table-cell';
+      else if (el.classList.contains('nav-link'))           el.style.display = 'flex';
+      else if (el.classList.contains('btn'))                el.style.display = 'inline-flex';
+      else if (el.classList.contains('nav-section-label')) el.style.display = 'block';
+      else                                                  el.style.display = 'block';
+    };
+
     // admin-only: visible para administrador y superadministrador
     document.querySelectorAll('.admin-only').forEach(el => {
-      if (!App.isAdmin()) {
-        el.style.display = 'none';
-        return;
-      }
-      // Restaurar display por tipo de elemento
-      if (el.tagName === 'TH' || el.tagName === 'TD') el.style.display = 'table-cell';
-      else if (el.classList.contains('nav-link') || el.classList.contains('btn')) el.style.display = '';
-      else if (el.classList.contains('nav-section-label')) el.style.display = 'block';
-      else el.style.display = '';
+      if (!App.isAdmin()) { el.style.display = 'none'; return; }
+      showEl(el);
     });
 
     // superadmin-only: visible solo para superadministrador
     document.querySelectorAll('.superadmin-only').forEach(el => {
-      if (!App.isSuperAdmin()) {
-        el.style.display = 'none';
-        return;
-      }
-      if (el.classList.contains('nav-link')) el.style.display = '';
-      else if (el.classList.contains('nav-section-label')) el.style.display = 'block';
-      else el.style.display = '';
+      if (!App.isSuperAdmin()) { el.style.display = 'none'; return; }
+      showEl(el);
     });
 
     // elevated-only: visible para supervisor y superior (pueden ver todos los datos)
     document.querySelectorAll('.elevated-only').forEach(el => {
-      if (!App.canViewAll()) {
-        el.style.display = 'none';
-        return;
-      }
-      if (el.tagName === 'TH' || el.tagName === 'TD') el.style.display = 'table-cell';
-      else el.style.display = '';
+      if (!App.canViewAll()) { el.style.display = 'none'; return; }
+      showEl(el);
     });
   },
 
