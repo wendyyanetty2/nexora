@@ -729,7 +729,7 @@ app.delete('/api/workers/:id', requireAuth, requireAdmin, async (req, res) => {
 
 app.get('/api/users/list', requireAuth, requireAdmin, async (req, res) => {
   try {
-    res.json(await all('SELECT id,dni,nombre,rol,tipo,tipo_relacion,cargo,empresa,activo FROM usuarios ORDER BY nombre'));
+    res.json(await all('SELECT id,dni,nombre,rol,tipo,tipo_relacion,cargo,empresa,ruc,email,telefono,activo FROM usuarios ORDER BY nombre'));
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 

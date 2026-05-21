@@ -95,7 +95,7 @@ const Workers = {
   async edit(id) {
     try {
       const workers = await api('/users/list?all=1');
-      const w = workers.find(x => x.id === id);
+      const w = workers.find(x => Number(x.id) === Number(id));
       if (!w) { toast('Trabajador no encontrado', 'error'); return; }
 
       document.getElementById('modalWorkerTitle').textContent = 'Editar trabajador';
