@@ -37,6 +37,9 @@ const App = {
 
     if (App.isAdmin()) await App.loadWorkerSelects();
     App.goTo('dashboard');
+
+    // Badge de reembolsos pendientes
+    App.startPendingBadge();
   },
 
   renderUser() {
@@ -128,6 +131,57 @@ const App = {
       catalogos:      () => Catalogos.load(),
     };
     loaders[module]?.();
+  },
+
+  /* ── Badge de reembolsos pendientes ── */
+  _badgeInterval: null,
+  _lastNotifiedCount: 0,
+
+  async loadPendingBadge() {
+    try {
+      const { count } = await api('/reimbursements/pending-count');
+      const badge = document.getElementById('reiBadge');
+      if (badge) {
+        badge.textContent = count;
+        badge.style.display = count > 0 ? '' : 'none';
+      }
+      // Título de la pestaña
+      document.title = count > 0
+        ? `(${count}) NEXORA — Sistema`
+        : 'NEXORA — Sistema';
+
+      // Notificación del navegador si el conteo subió
+      if (count > App._lastNotifiedCount && App._lastNotifiedCount >= 0) {
+        App._sendBrowserNotification(count);
+      }
+      App._lastNotifiedCount = count;
+    } catch(e) { /* silencioso */ }
+  },
+
+  startPendingBadge() {
+    App.loadPendingBadge();
+    // Pedir permiso de notificaciones (sin bloquear)
+    if ('Notification' in window && Notification.permission === 'default') {
+      setTimeout(() => Notification.requestPermission(), 3000);
+    }
+    // Actualizar cada 60 segundos
+    clearInterval(App._badgeInterval);
+    App._badgeInterval = setInterval(() => App.loadPendingBadge(), 60000);
+  },
+
+  _sendBrowserNotification(count) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    const label = App.canViewAll()
+      ? `${count} solicitud(es) pendiente(s) de revisión`
+      : `Tienes ${count} solicitud(es) en proceso`;
+    try {
+      new Notification('💳 NEXORA — Reembolsos', {
+        body: label,
+        icon: '/img/logo.svg',
+        badge: '/img/logo.svg',
+        tag: 'nexora-reembolsos', // reemplaza notif anterior, no acumula
+      });
+    } catch(e) { /* Safari puede fallar silenciosamente */ }
   },
 
   async loadWorkerSelects() {

@@ -182,9 +182,9 @@ const Reimbursements = {
         document.getElementById('rVehiculo').value = r.vehiculo_id || '';
       }
 
-      // Fecha de factura
+      // Fecha de factura (puede ser de meses pasados)
       const ffEl = document.getElementById('rFechaFactura');
-      if (ffEl) ffEl.value = r.fecha_factura ? r.fecha_factura.slice(0,10) : new Date().toISOString().slice(0,10);
+      if (ffEl) ffEl.value = r.fecha_factura ? r.fecha_factura.slice(0,10) : '';
 
       document.getElementById('rMotivoLibreGroup').style.display    = r.motivo_libre     ? '' : 'none';
       document.getElementById('rDescripcionLibreGroup').style.display = r.descripcion_libre ? '' : 'none';
@@ -202,9 +202,9 @@ const Reimbursements = {
       if (el) el.value = '';
     });
     document.getElementById('rTipoDoc').value = '';
-    // Fecha factura: por defecto hoy
+    // Fecha factura: vacía para que el usuario elija (pueden ser facturas de meses pasados)
     const ffEl = document.getElementById('rFechaFactura');
-    if (ffEl) ffEl.value = new Date().toISOString().slice(0,10);
+    if (ffEl) ffEl.value = '';
     document.getElementById('rFilePreview').innerHTML = '';
     document.getElementById('rUploadZone').classList.remove('has-file');
     document.getElementById('rVehiculoGroup').style.display            = 'none';
@@ -447,6 +447,7 @@ const Reimbursements = {
 
       closeModal('modalReembolso');
       Reimbursements.load();
+      App.loadPendingBadge();
     } catch(e) {
       toast(e.message, 'error');
     } finally {
@@ -462,6 +463,7 @@ const Reimbursements = {
       await api(`/reimbursements/${id}`, { method: 'PUT', body: { status } });
       toast('Estado actualizado', 'success');
       Reimbursements.load();
+      App.loadPendingBadge();
     } catch(e) { toast(e.message, 'error'); }
   },
 
@@ -480,6 +482,7 @@ const Reimbursements = {
       closeModal('modalRechazo');
       toast('Solicitud rechazada', 'success');
       Reimbursements.load();
+      App.loadPendingBadge();
     } catch(e) { toast(e.message, 'error'); }
   },
 
@@ -489,6 +492,7 @@ const Reimbursements = {
       await api(`/reimbursements/${id}`, { method: 'DELETE' });
       toast('Solicitud eliminada', 'success');
       Reimbursements.load();
+      App.loadPendingBadge();
     } catch(e) { toast(e.message, 'error'); }
   }
 };

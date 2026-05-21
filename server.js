@@ -244,6 +244,23 @@ app.get('/api/attendance/export', requireAuth, async (req, res) => {
 // ════════════════════════════════════════════════════════════
 //  REEMBOLSOS
 // ════════════════════════════════════════════════════════════
+// Conteo de solicitudes pendientes para badge/notificación
+app.get('/api/reimbursements/pending-count', requireAuth, async (req, res) => {
+  try {
+    let count = 0;
+    if (canViewAll(req.user.rol)) {
+      // Admins/supervisores: enviado + en_revision (esperan su acción)
+      const r = await one("SELECT COUNT(*) as c FROM reembolsos WHERE estado IN ('enviado','en_revision')");
+      count = parseInt(r.c) || 0;
+    } else {
+      // Trabajadores: sus propias solicitudes en revisión o enviadas
+      const r = await one("SELECT COUNT(*) as c FROM reembolsos WHERE usuario_id=$1 AND estado IN ('enviado','en_revision')", [req.user.id]);
+      count = parseInt(r.c) || 0;
+    }
+    res.json({ count });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
 app.get('/api/reimbursements/export', requireAuth, async (req, res) => {
   try {
     const { from, to, userId, status } = req.query;
