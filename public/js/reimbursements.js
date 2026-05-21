@@ -182,13 +182,9 @@ const Reimbursements = {
         document.getElementById('rVehiculo').value = r.vehiculo_id || '';
       }
 
-      // Medio de pago
-      if (r.medio_pago) {
-        const radios = document.querySelectorAll('input[name="rMedioPago"]');
-        radios.forEach(rb => { if (rb.value === r.medio_pago) rb.checked = true; });
-        document.getElementById('rNumOperacion').value = r.numero_operacion || '';
-        document.getElementById('rNumOperacionGroup').style.display = '';
-      }
+      // Fecha de factura
+      const ffEl = document.getElementById('rFechaFactura');
+      if (ffEl) ffEl.value = r.fecha_factura ? r.fecha_factura.slice(0,10) : new Date().toISOString().slice(0,10);
 
       document.getElementById('rMotivoLibreGroup').style.display    = r.motivo_libre     ? '' : 'none';
       document.getElementById('rDescripcionLibreGroup').style.display = r.descripcion_libre ? '' : 'none';
@@ -201,22 +197,23 @@ const Reimbursements = {
   },
 
   _resetForm() {
-    ['rMonto','rRuc','rProveedor','rNumDoc','rNotas','rMotivoLibre','rDescripcionLibre','rNumOperacion'].forEach(id => {
+    ['rMonto','rRuc','rProveedor','rNumDoc','rNotas','rMotivoLibre','rDescripcionLibre'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
     document.getElementById('rTipoDoc').value = '';
+    // Fecha factura: por defecto hoy
+    const ffEl = document.getElementById('rFechaFactura');
+    if (ffEl) ffEl.value = new Date().toISOString().slice(0,10);
     document.getElementById('rFilePreview').innerHTML = '';
     document.getElementById('rUploadZone').classList.remove('has-file');
     document.getElementById('rVehiculoGroup').style.display            = 'none';
     document.getElementById('rMotivoLibreGroup').style.display         = 'none';
     document.getElementById('rDescripcionLibreGroup').style.display    = 'none';
-    document.getElementById('rNumOperacionGroup').style.display        = 'none';
     const libreGrp = document.getElementById('rEmpresaObraLibreGroup');
     if (libreGrp) libreGrp.style.display = 'none';
     const libreInp = document.getElementById('rEmpresaObraLibre');
     if (libreInp) libreInp.value = '';
-    document.querySelectorAll('input[name="rMedioPago"]').forEach(r => r.checked = false);
     // Deseleccionar tipo de gasto
     document.querySelectorAll('.tipo-gasto-card').forEach(c => c.classList.remove('selected'));
     document.getElementById('rTipoGastoHidden').value = '';
@@ -343,10 +340,6 @@ const Reimbursements = {
     document.getElementById('rVehiculoGroup').style.display = needsVehiculo ? '' : 'none';
   },
 
-  onMedioPagoChange() {
-    document.getElementById('rNumOperacionGroup').style.display = '';
-  },
-
   onFileSelect(files) {
     Array.from(files).forEach(f => {
       if (Reimbursements._files.length < 5) Reimbursements._files.push(f);
@@ -432,11 +425,9 @@ const Reimbursements = {
       fd.append('ruc_proveedor',     document.getElementById('rRuc').value || '');
       fd.append('nombre_proveedor',  document.getElementById('rProveedor').value || '');
 
-      // Medio de pago
-      const medioPago = document.querySelector('input[name="rMedioPago"]:checked')?.value || '';
-      fd.append('medio_pago',       medioPago);
-      fd.append('numero_operacion', document.getElementById('rNumOperacion').value || '');
-      fd.append('notas',            document.getElementById('rNotas').value || '');
+      // Fecha de factura
+      fd.append('fecha_factura', document.getElementById('rFechaFactura')?.value || '');
+      fd.append('notas',         document.getElementById('rNotas').value || '');
 
       // Archivos (solo en nueva solicitud)
       if (!Reimbursements._editId) {

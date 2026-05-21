@@ -2,9 +2,16 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#6366f1"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="apple-mobile-web-app-title" content="NEXORA"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
   <title>NEXORA — Sistema</title>
   <link rel="icon" href="/img/logo.svg"/>
+  <link rel="apple-touch-icon" href="/img/logo.svg"/>
+  <link rel="manifest" href="/manifest.json"/>
   <link rel="stylesheet" href="/css/styles.css"/>
 </head>
 <body>
@@ -558,29 +565,10 @@
         <input type="text" class="form-input" id="rProveedor" placeholder="Nombre o razón social"/>
       </div>
 
-      <!-- 11. Medio de pago -->
+      <!-- 11. Fecha de factura / comprobante -->
       <div class="form-group">
-        <label class="form-label">Medio de pago</label>
-        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:6px">
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
-            <input type="radio" name="rMedioPago" value="banco_transferencia" onchange="Reimbursements.onMedioPagoChange()"/>
-            <span>🏦 Banco / Transferencia</span>
-          </label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
-            <input type="radio" name="rMedioPago" value="yape" onchange="Reimbursements.onMedioPagoChange()"/>
-            <span>📱 Yape</span>
-          </label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
-            <input type="radio" name="rMedioPago" value="plin" onchange="Reimbursements.onMedioPagoChange()"/>
-            <span>📱 Plin</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- 12. N° de operación (condicional) -->
-      <div class="form-group" id="rNumOperacionGroup" style="display:none">
-        <label class="form-label">N° de operación</label>
-        <input type="text" class="form-input" id="rNumOperacion" placeholder="N° de transferencia / operación"/>
+        <label class="form-label">Fecha de factura / comprobante</label>
+        <input type="date" class="form-input" id="rFechaFactura"/>
       </div>
 
       <!-- Notas -->

@@ -1,0 +1,13 @@
+{
+  "name": "NEXORA — Control de Asistencia",
+  "short_name": "NEXORA",
+  "description": "Sistema de control de asistencia y reembolsos para JVÑ General Services",
+  "start_url": "/app.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "/img/logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

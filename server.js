@@ -307,7 +307,7 @@ app.post('/api/reimbursements', requireAuth, upload.array('archivos', 5), async 
       descripcion_id, descripcion_nombre, descripcion_libre,
       vehiculo_id, vehiculo_nombre,
       monto, ruc_proveedor, nombre_proveedor, tipo_comprobante, numero_documento,
-      medio_pago, numero_operacion, notas
+      fecha_factura, notas
     } = req.body;
     if (!monto) return res.status(400).json({ error: 'El monto es obligatorio' });
     const concepto = descripcion_nombre || descripcion_libre || tipo_gasto || 'Reembolso';
@@ -332,8 +332,8 @@ app.post('/api/reimbursements', requireAuth, upload.array('archivos', 5), async 
         descripcion_id, descripcion_nombre, descripcion_libre,
         vehiculo_id, vehiculo_nombre,
         ruc_proveedor, nombre_proveedor, tipo_comprobante, numero_documento,
-        medio_pago, numero_operacion, estado, archivos, notas, historial_estados
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,'enviado',$22,$23,$24)
+        fecha_factura, estado, archivos, notas, historial_estados
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,'enviado',$21,$22,$23)
       RETURNING id
     `, [
       req.user.id, fecha, concepto, parseFloat(monto)||0,
@@ -342,7 +342,7 @@ app.post('/api/reimbursements', requireAuth, upload.array('archivos', 5), async 
       descripcion_id||null, descripcion_nombre||'', descripcion_libre||'',
       vehiculo_id||null, vehiculo_nombre||'',
       ruc_proveedor||'', nombre_proveedor||'', tipo_comprobante||'', numero_documento||'',
-      medio_pago||'', numero_operacion||'',
+      fecha_factura||null,
       JSON.stringify(archivos), notas||'', historial
     ]);
     res.json({ ok: true, id: row.id });
@@ -388,7 +388,7 @@ app.put('/api/reimbursements/:id', requireAuth, async (req, res) => {
       descripcion_id, descripcion_nombre, descripcion_libre,
       vehiculo_id, vehiculo_nombre,
       monto, ruc_proveedor, nombre_proveedor, tipo_comprobante, numero_documento,
-      medio_pago, numero_operacion, notas
+      fecha_factura, notas
     } = req.body;
     const concepto = descripcion_nombre || descripcion_libre || tipo_gasto || r.concepto || '';
     await pool.query(`
@@ -398,8 +398,8 @@ app.put('/api/reimbursements/:id', requireAuth, async (req, res) => {
         descripcion_id=$9,descripcion_nombre=$10,descripcion_libre=$11,
         vehiculo_id=$12,vehiculo_nombre=$13,
         ruc_proveedor=$14,nombre_proveedor=$15,tipo_comprobante=$16,numero_documento=$17,
-        medio_pago=$18,numero_operacion=$19,notas=$20
-      WHERE id=$21
+        fecha_factura=$18,notas=$19
+      WHERE id=$20
     `, [
       concepto, parseFloat(monto)||r.monto,
       tipo_gasto||r.tipo_gasto, empresa_obra_id||r.empresa_obra_id, empresa_obra_nombre||r.empresa_obra_nombre,
@@ -408,7 +408,7 @@ app.put('/api/reimbursements/:id', requireAuth, async (req, res) => {
       vehiculo_id||r.vehiculo_id, vehiculo_nombre||r.vehiculo_nombre,
       ruc_proveedor??r.ruc_proveedor, nombre_proveedor??r.nombre_proveedor,
       tipo_comprobante||r.tipo_comprobante, numero_documento??r.numero_documento,
-      medio_pago||r.medio_pago, numero_operacion??r.numero_operacion, notas??r.notas,
+      fecha_factura??r.fecha_factura, notas??r.notas,
       req.params.id
     ]);
     res.json({ ok: true });
