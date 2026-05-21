@@ -33,8 +33,8 @@
       <button class="nav-link admin-only" data-module="reports"><span class="icon">📊</span> Reportes</button>
       <button class="nav-link admin-only" data-module="config"><span class="icon">⚙️</span> Configuración</button>
 
-      <div class="nav-section-label superadmin-only">Catálogos</div>
-      <button class="nav-link superadmin-only" data-module="catalogos"><span class="icon">📋</span> Catálogos</button>
+      <div class="nav-section-label admin-only">Catálogos</div>
+      <button class="nav-link admin-only" data-module="catalogos"><span class="icon">📋</span> Catálogos</button>
     </nav>
 
     <div class="sidebar-bottom">
@@ -482,9 +482,13 @@
       <!-- 2. Empresa / Obra -->
       <div class="form-group">
         <label class="form-label">Empresa / Obra <span class="required">*</span></label>
-        <select class="form-select" id="rEmpresaObra">
+        <select class="form-select" id="rEmpresaObra" onchange="Reimbursements.onEmpresaChange()">
           <option value="">Seleccionar empresa/obra...</option>
         </select>
+      </div>
+      <div class="form-group" id="rEmpresaObraLibreGroup" style="display:none">
+        <label class="form-label">Especificar empresa / obra <span class="required">*</span></label>
+        <input type="text" class="form-input" id="rEmpresaObraLibre" placeholder="Escribe el nombre de la empresa u obra"/>
       </div>
 
       <!-- 3. Motivo / Actividad -->

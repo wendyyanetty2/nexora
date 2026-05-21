@@ -446,8 +446,8 @@ const catalogCRUD = (table, orderBy) => {
     } catch(e) { res.status(500).json({ error: e.message }); }
   });
 
-  // Todos (incluye inactivos) — solo superadmin, para panel de gestión
-  app.get(`/api/catalogs/${table}/all`, requireAuth, requireSuperAdmin, async (req, res) => {
+  // Todos (incluye inactivos) — admin+, para panel de gestión
+  app.get(`/api/catalogs/${table}/all`, requireAuth, requireAdmin, async (req, res) => {
     try {
       const { tipo_gasto } = req.query;
       let sql = `SELECT * FROM ${table} WHERE 1=1`;
@@ -459,7 +459,7 @@ const catalogCRUD = (table, orderBy) => {
   });
 
   // Crear
-  app.post(`/api/catalogs/${table}`, requireAuth, requireSuperAdmin, async (req, res) => {
+  app.post(`/api/catalogs/${table}`, requireAuth, requireAdmin, async (req, res) => {
     try {
       const { nombre, codigo, placa, tipo_gasto, orden } = req.body;
       if (!nombre) return res.status(400).json({ error: 'El nombre es obligatorio' });
@@ -481,7 +481,7 @@ const catalogCRUD = (table, orderBy) => {
   });
 
   // Actualizar
-  app.put(`/api/catalogs/${table}/:id`, requireAuth, requireSuperAdmin, async (req, res) => {
+  app.put(`/api/catalogs/${table}/:id`, requireAuth, requireAdmin, async (req, res) => {
     try {
       const { nombre, codigo, placa, tipo_gasto, orden } = req.body;
       if (table === 'catalogo_vehiculos') {
@@ -496,7 +496,7 @@ const catalogCRUD = (table, orderBy) => {
   });
 
   // Toggle activo/inactivo (nunca borra)
-  app.put(`/api/catalogs/${table}/:id/toggle`, requireAuth, requireSuperAdmin, async (req, res) => {
+  app.put(`/api/catalogs/${table}/:id/toggle`, requireAuth, requireAdmin, async (req, res) => {
     try {
       const item = await one(`SELECT activo FROM ${table} WHERE id=$1`, [req.params.id]);
       if (!item) return res.status(404).json({ error: 'No encontrado' });

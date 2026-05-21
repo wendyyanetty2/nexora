@@ -152,7 +152,16 @@ const Reimbursements = {
 
       // Precargar valores
       Reimbursements._selectTipoGasto(r.tipo_gasto);
-      document.getElementById('rEmpresaObra').value      = r.empresa_obra_id || '';
+      // Empresa / Obra — puede ser de catálogo o texto libre (Otros)
+      if (r.empresa_obra_id) {
+        document.getElementById('rEmpresaObra').value = r.empresa_obra_id;
+      } else if (r.empresa_obra_nombre) {
+        document.getElementById('rEmpresaObra').value = 'otros';
+        const libreGrp = document.getElementById('rEmpresaObraLibreGroup');
+        const libreInp = document.getElementById('rEmpresaObraLibre');
+        if (libreGrp) libreGrp.style.display = '';
+        if (libreInp) libreInp.value = r.empresa_obra_nombre;
+      }
       document.getElementById('rMotivo').value           = r.motivo_id === null ? '' : (r.motivo_nombre === 'Otros' ? 'otros' : r.motivo_id || '');
       document.getElementById('rMotivoLibre').value      = r.motivo_libre || '';
       document.getElementById('rMonto').value            = r.monto || '';
@@ -199,10 +208,14 @@ const Reimbursements = {
     document.getElementById('rTipoDoc').value = '';
     document.getElementById('rFilePreview').innerHTML = '';
     document.getElementById('rUploadZone').classList.remove('has-file');
-    document.getElementById('rVehiculoGroup').style.display       = 'none';
-    document.getElementById('rMotivoLibreGroup').style.display    = 'none';
-    document.getElementById('rDescripcionLibreGroup').style.display = 'none';
-    document.getElementById('rNumOperacionGroup').style.display   = 'none';
+    document.getElementById('rVehiculoGroup').style.display            = 'none';
+    document.getElementById('rMotivoLibreGroup').style.display         = 'none';
+    document.getElementById('rDescripcionLibreGroup').style.display    = 'none';
+    document.getElementById('rNumOperacionGroup').style.display        = 'none';
+    const libreGrp = document.getElementById('rEmpresaObraLibreGroup');
+    if (libreGrp) libreGrp.style.display = 'none';
+    const libreInp = document.getElementById('rEmpresaObraLibre');
+    if (libreInp) libreInp.value = '';
     document.querySelectorAll('input[name="rMedioPago"]').forEach(r => r.checked = false);
     // Deseleccionar tipo de gasto
     document.querySelectorAll('.tipo-gasto-card').forEach(c => c.classList.remove('selected'));
@@ -227,6 +240,11 @@ const Reimbursements = {
       opt.textContent = e.nombre;
       selEmp.appendChild(opt);
     });
+    // Opción fija "Otros"
+    const optEmpOtros = document.createElement('option');
+    optEmpOtros.value = 'otros';
+    optEmpOtros.textContent = '✏️ Otros (escribir)';
+    selEmp.appendChild(optEmpOtros);
 
     // Motivos
     const selMot = document.getElementById('rMotivo');
@@ -293,6 +311,16 @@ const Reimbursements = {
     document.getElementById('rDescripcion').value = '';
     document.getElementById('rDescripcionLibreGroup').style.display = 'none';
     document.getElementById('rVehiculoGroup').style.display = 'none';
+  },
+
+  onEmpresaChange() {
+    const sel = document.getElementById('rEmpresaObra');
+    const libreGroup = document.getElementById('rEmpresaObraLibreGroup');
+    if (libreGroup) libreGroup.style.display = sel.value === 'otros' ? '' : 'none';
+    if (sel.value !== 'otros') {
+      const libreInput = document.getElementById('rEmpresaObraLibre');
+      if (libreInput) libreInput.value = '';
+    }
   },
 
   onMotivoChange() {
@@ -364,10 +392,17 @@ const Reimbursements = {
       // Tipo de gasto
       fd.append('tipo_gasto', tipoGasto);
 
-      // Empresa/Obra
+      // Empresa/Obra (puede ser catálogo o texto libre "Otros")
       const selEmp = document.getElementById('rEmpresaObra');
-      fd.append('empresa_obra_id',     selEmp.value || '');
-      fd.append('empresa_obra_nombre', selEmp.options[selEmp.selectedIndex]?.dataset?.nombre || '');
+      if (selEmp.value === 'otros') {
+        const libreEmp = document.getElementById('rEmpresaObraLibre')?.value.trim() || '';
+        if (!libreEmp) { toast('Escribe el nombre de la empresa u obra', 'error'); btn.disabled = false; btn.textContent = Reimbursements._editId ? 'Actualizar solicitud' : 'Enviar solicitud'; return; }
+        fd.append('empresa_obra_id',     '');
+        fd.append('empresa_obra_nombre', libreEmp);
+      } else {
+        fd.append('empresa_obra_id',     selEmp.value || '');
+        fd.append('empresa_obra_nombre', selEmp.options[selEmp.selectedIndex]?.dataset?.nombre || '');
+      }
 
       // Motivo
       const selMot = document.getElementById('rMotivo');
