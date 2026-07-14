@@ -161,11 +161,11 @@
                 <th>Fecha</th>
                 <th class="elevated-only">Trabajador</th>
                 <th class="elevated-only">Tipo</th>
-                <th>Entrada</th><th>Salida</th><th>Ubicación</th><th>Estado</th>
+                <th>Entrada</th><th>Salida</th><th>Ubicación</th><th>Estado</th><th>Acciones</th>
               </tr>
             </thead>
             <tbody id="attBody">
-              <tr><td colspan="7" style="text-align:center;padding:40px"><div class="spinner"></div></td></tr>
+              <tr><td colspan="8" style="text-align:center;padding:40px"><div class="spinner"></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -620,6 +620,50 @@
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modalRechazo')">Cancelar</button>
       <button class="btn btn-danger" onclick="Reimbursements.confirmReject()">✗ Confirmar rechazo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Editar registro de asistencia -->
+<div class="modal-overlay" id="modalAsistencia">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">📍 Editar registro de asistencia</div>
+        <div class="text-sm text-muted" id="modalAsistenciaSubtitle"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modalAsistencia')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Fecha <span class="required">*</span></label>
+        <input type="date" class="form-input" id="aFecha"/>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Hora de entrada <span class="required">*</span></label>
+          <input type="time" step="1" class="form-input" id="aHoraEntrada"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hora de salida</label>
+          <input type="time" step="1" class="form-input" id="aHoraSalida"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Estado <span class="required">*</span></label>
+        <select class="form-select" id="aEstado">
+          <option value="activo">Activo (sin salida)</option>
+          <option value="completado">Completado</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notas</label>
+        <textarea class="form-textarea" id="aNotas" placeholder="Motivo de la corrección, observaciones..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalAsistencia')">Cancelar</button>
+      <button class="btn btn-primary" id="btnSaveAsistencia" onclick="Attendance.saveEdit()">Guardar cambios</button>
     </div>
   </div>
 </div>

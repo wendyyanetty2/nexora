@@ -45,26 +45,79 @@ const Attendance = {
 
     try {
       const data = await api('/attendance?' + qs.toString());
-      const isAdmin = App.currentUser.rol === 'admin';
+      // Roles válidos son jerárquicos ('administrador','superadministrador', etc.),
+      // 'admin' ya no existe desde la migración a roles v3 — usar App.canViewAll()/App.isAdmin()
+      const isElevated = App.canViewAll();
+      const isAdmin    = App.isAdmin();
 
       if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-muted" style="text-align:center;padding:40px">Sin registros encontrados</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="text-muted" style="text-align:center;padding:40px">Sin registros encontrados</td></tr>`;
         return;
       }
 
       tbody.innerHTML = data.map(a => `
         <tr>
           <td>${fmtDate(a.fecha)}</td>
-          <td class="admin-only" ${!isAdmin ? 'style="display:none"' : ''}>${a.nombre || '–'}</td>
-          <td class="admin-only" ${!isAdmin ? 'style="display:none"' : ''}><span class="badge ${a.tipo === 'externo' ? 'badge-gray' : 'badge-primary'}">${a.tipo === 'externo' ? 'Externo' : 'Planilla'}</span></td>
+          <td class="elevated-only" ${!isElevated ? 'style="display:none"' : ''}>${a.nombre || '–'}</td>
+          <td class="elevated-only" ${!isElevated ? 'style="display:none"' : ''}><span class="badge ${a.tipo === 'externo' ? 'badge-gray' : 'badge-primary'}">${a.tipo === 'externo' ? 'Externo' : 'Planilla'}</span></td>
           <td>${a.hora_entrada || '–'}</td>
           <td>${a.hora_salida || '<span class="text-warning">En curso</span>'}</td>
           <td class="text-sm text-muted" title="${a.direccion_entrada || ''}">${Attendance._shortAddr(a.direccion_entrada)}</td>
-          <td>${statusBadge(a.estado)}</td>
+          <td>${statusBadge(a.estado)}${a.editado_por ? `<br><span class="text-xs text-muted" title="Editado por ${a.editado_por_nombre || '—'} el ${fmtDate(a.fecha_edicion)}">✎ Editado</span>` : ''}</td>
+          <td>${isAdmin ? `<button class="btn btn-secondary btn-xs" onclick="Attendance.openEdit(${a.id})">✏️ Editar</button>` : '<span class="text-muted text-sm">–</span>'}</td>
         </tr>
       `).join('');
     } catch(e) {
-      tbody.innerHTML = `<tr><td colspan="7" class="text-danger" style="text-align:center;padding:20px">Error: ${e.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" class="text-danger" style="text-align:center;padding:20px">Error: ${e.message}</td></tr>`;
+    }
+  },
+
+  _editId: null,
+
+  async openEdit(id) {
+    try {
+      const data = await api('/attendance');
+      const a = data.find(x => Number(x.id) === Number(id));
+      if (!a) { toast('Registro no encontrado', 'error'); return; }
+      Attendance._editId = id;
+      document.getElementById('aFecha').value       = a.fecha || '';
+      document.getElementById('aHoraEntrada').value = a.hora_entrada || '';
+      document.getElementById('aHoraSalida').value  = a.hora_salida || '';
+      document.getElementById('aEstado').value      = a.estado || 'activo';
+      document.getElementById('aNotas').value       = a.notas || '';
+      document.getElementById('modalAsistenciaSubtitle').textContent = `${a.nombre || ''} — ${fmtDate(a.fecha)}`;
+      openModal('modalAsistencia');
+    } catch(e) { toast(e.message, 'error'); }
+  },
+
+  async saveEdit() {
+    const fecha       = document.getElementById('aFecha').value;
+    const horaEntrada  = document.getElementById('aHoraEntrada').value;
+    const horaSalida   = document.getElementById('aHoraSalida').value;
+    const estado       = document.getElementById('aEstado').value;
+    const notas        = document.getElementById('aNotas').value;
+
+    if (!fecha)       { toast('La fecha es obligatoria', 'error'); return; }
+    if (!horaEntrada) { toast('La hora de entrada es obligatoria', 'error'); return; }
+    if (estado === 'completado' && !horaSalida) {
+      toast('La hora de salida es obligatoria para un registro completado', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('btnSaveAsistencia');
+    btn.disabled = true;
+    try {
+      await api(`/attendance/${Attendance._editId}`, {
+        method: 'PUT',
+        body: { fecha, hora_entrada: horaEntrada, hora_salida: horaSalida, estado, notas }
+      });
+      toast('✅ Registro de asistencia actualizado', 'success');
+      closeModal('modalAsistencia');
+      Attendance.load();
+    } catch(e) {
+      toast(e.message, 'error');
+    } finally {
+      btn.disabled = false;
     }
   },
 

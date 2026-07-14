@@ -79,7 +79,7 @@ const Reimbursements = {
             <td class="text-sm">${desc}</td>
             <td><strong>${fmtMoney(r.monto)}</strong></td>
             <td style="text-align:center">${fileLinks || '<span class="text-muted">–</span>'}</td>
-            <td>${statusBadge(r.estado)}${r.motivo_rechazo ? `<br><span class="text-xs text-danger" title="${r.motivo_rechazo}">⚠ Ver motivo</span>` : ''}</td>
+            <td>${statusBadge(r.estado)}${r.motivo_rechazo ? `<br><span class="text-xs text-danger" title="${r.motivo_rechazo}">⚠ Ver motivo</span>` : ''}${r.editado_por ? `<br><span class="text-xs text-muted" title="Editado por ${r.editado_por_nombre || '—'} el ${fmtDate(r.fecha_edicion)}">✎ Editado</span>` : ''}</td>
             <td>${acciones}</td>
           </tr>
         `;
@@ -143,7 +143,8 @@ const Reimbursements = {
     await Reimbursements.loadCatalogs();
     try {
       const data = await api('/reimbursements');
-      const r = data.find(x => x.id === id);
+      // pg devuelve columnas BIGINT (id) como string; comparar con Number() (ver f290c42)
+      const r = data.find(x => Number(x.id) === Number(id));
       if (!r) { toast('Solicitud no encontrada', 'error'); return; }
       Reimbursements._editId = id;
       Reimbursements._files  = [];

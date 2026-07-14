@@ -164,8 +164,9 @@ app.get('/api/attendance', requireAuth, async (req, res) => {
     const { date, userId, from, to } = req.query;
     const params = [];
     const p = (v) => { params.push(v); return `$${params.length}`; };
-    let sql = `SELECT a.*, u.nombre, u.dni, u.tipo, u.empresa
-               FROM asistencia a JOIN usuarios u ON u.id=a.usuario_id WHERE 1=1`;
+    let sql = `SELECT a.*, u.nombre, u.dni, u.tipo, u.empresa, eu.nombre AS editado_por_nombre
+               FROM asistencia a JOIN usuarios u ON u.id=a.usuario_id
+               LEFT JOIN usuarios eu ON eu.id=a.editado_por WHERE 1=1`;
     if (!canViewAll(req.user.rol)) sql += ` AND a.usuario_id=${p(req.user.id)}`;
     else if (userId) sql += ` AND a.usuario_id=${p(userId)}`;
     if (date) sql += ` AND a.fecha=${p(date)}`;
@@ -209,6 +210,30 @@ app.post('/api/attendance/checkout', requireAuth, async (req, res) => {
       [hora, lat||null, lng||null, address||'', active.id]
     );
     res.json({ ok: true, hora, fecha, direccion: address });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/attendance/:id', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const a = await one('SELECT * FROM asistencia WHERE id=$1', [req.params.id]);
+    if (!a) return res.status(404).json({ error: 'Registro de asistencia no encontrado' });
+
+    const { fecha, hora_entrada, hora_salida, estado, notas } = req.body;
+    if (!fecha)         return res.status(400).json({ error: 'La fecha es obligatoria' });
+    if (!hora_entrada)  return res.status(400).json({ error: 'La hora de entrada es obligatoria' });
+    const validos = ['activo', 'completado'];
+    if (estado && !validos.includes(estado)) return res.status(400).json({ error: 'Estado inválido' });
+    if (estado === 'completado' && !hora_salida) {
+      return res.status(400).json({ error: 'La hora de salida es obligatoria para marcar el registro como completado' });
+    }
+
+    await pool.query(`
+      UPDATE asistencia SET
+        fecha=$1, hora_entrada=$2, hora_salida=$3, estado=$4, notas=$5,
+        editado_por=$6, fecha_edicion=NOW()
+      WHERE id=$7
+    `, [fecha, hora_entrada, hora_salida || null, estado || a.estado, notas ?? a.notas, req.user.id, req.params.id]);
+    res.json({ ok: true });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -304,8 +329,9 @@ app.get('/api/reimbursements', requireAuth, async (req, res) => {
     const { status, userId, from, to } = req.query;
     const params = [];
     const p = (v) => { params.push(v); return `$${params.length}`; };
-    let sql = `SELECT r.*, u.nombre, u.dni, u.tipo, u.empresa
-               FROM reembolsos r JOIN usuarios u ON u.id=r.usuario_id WHERE 1=1`;
+    let sql = `SELECT r.*, u.nombre, u.dni, u.tipo, u.empresa, eu.nombre AS editado_por_nombre
+               FROM reembolsos r JOIN usuarios u ON u.id=r.usuario_id
+               LEFT JOIN usuarios eu ON eu.id=r.editado_por WHERE 1=1`;
     if (!canViewAll(req.user.rol)) sql += ` AND r.usuario_id=${p(req.user.id)}`;
     else if (userId) sql += ` AND r.usuario_id=${p(userId)}`;
     if (status) sql += ` AND r.estado=${p(status)}`;
@@ -407,6 +433,9 @@ app.put('/api/reimbursements/:id', requireAuth, async (req, res) => {
       monto, ruc_proveedor, nombre_proveedor, tipo_comprobante, numero_documento,
       fecha_factura, notas
     } = req.body;
+    if (monto !== undefined && (isNaN(parseFloat(monto)) || parseFloat(monto) <= 0)) {
+      return res.status(400).json({ error: 'El monto debe ser un número mayor a cero' });
+    }
     const concepto = descripcion_nombre || descripcion_libre || tipo_gasto || r.concepto || '';
     await pool.query(`
       UPDATE reembolsos SET concepto=$1,monto=$2,
@@ -415,8 +444,9 @@ app.put('/api/reimbursements/:id', requireAuth, async (req, res) => {
         descripcion_id=$9,descripcion_nombre=$10,descripcion_libre=$11,
         vehiculo_id=$12,vehiculo_nombre=$13,
         ruc_proveedor=$14,nombre_proveedor=$15,tipo_comprobante=$16,numero_documento=$17,
-        fecha_factura=$18,notas=$19
-      WHERE id=$20
+        fecha_factura=$18,notas=$19,
+        editado_por=$20,fecha_edicion=NOW()
+      WHERE id=$21
     `, [
       concepto, parseFloat(monto)||r.monto,
       tipo_gasto||r.tipo_gasto, empresa_obra_id||r.empresa_obra_id, empresa_obra_nombre||r.empresa_obra_nombre,
@@ -425,8 +455,8 @@ app.put('/api/reimbursements/:id', requireAuth, async (req, res) => {
       vehiculo_id||r.vehiculo_id, vehiculo_nombre||r.vehiculo_nombre,
       ruc_proveedor??r.ruc_proveedor, nombre_proveedor??r.nombre_proveedor,
       tipo_comprobante||r.tipo_comprobante, numero_documento??r.numero_documento,
-      fecha_factura??r.fecha_factura, notas??r.notas,
-      req.params.id
+      (fecha_factura ?? r.fecha_factura) || null, notas??r.notas,
+      req.user.id, req.params.id
     ]);
     res.json({ ok: true });
   } catch(e) { res.status(500).json({ error: e.message }); }
