@@ -11,6 +11,14 @@ const { v4: uuidv4 } = require('uuid');
 
 const PORT = process.env.PORT || 3001;
 
+// ─── Zona horaria Perú ──────────────────────────────────────────
+// El servidor (Render) corre en UTC; usar new Date().toISOString() para
+// fecha/hora hace que los registros salten al día siguiente después de
+// las 19:00 hora Perú (UTC-5). Estos helpers fijan la zona horaria.
+const PERU_TZ = 'America/Lima';
+const fechaPeru = () => new Date().toLocaleDateString('en-CA', { timeZone: PERU_TZ }); // YYYY-MM-DD
+const horaPeru  = () => new Date().toLocaleTimeString('es-PE',  { timeZone: PERU_TZ, hour12: false });
+
 // ─── Base de datos ────────────────────────────────────────────
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 const one = async (sql, params = []) => { const r = await pool.query(sql, params); return r.rows[0] || null; };
@@ -180,8 +188,8 @@ app.get('/api/attendance', requireAuth, async (req, res) => {
 app.post('/api/attendance/checkin', requireAuth, async (req, res) => {
   try {
     const { lat, lng, address } = req.body;
-    const fecha = new Date().toISOString().slice(0, 10);
-    const hora  = new Date().toLocaleTimeString('es-PE', { hour12: false });
+    const fecha = fechaPeru();
+    const hora  = horaPeru();
     const existing = await one(
       'SELECT id FROM asistencia WHERE usuario_id=$1 AND fecha=$2 AND hora_salida IS NULL ORDER BY id DESC LIMIT 1',
       [req.user.id, fecha]
@@ -198,8 +206,8 @@ app.post('/api/attendance/checkin', requireAuth, async (req, res) => {
 app.post('/api/attendance/checkout', requireAuth, async (req, res) => {
   try {
     const { lat, lng, address } = req.body;
-    const fecha = new Date().toISOString().slice(0, 10);
-    const hora  = new Date().toLocaleTimeString('es-PE', { hour12: false });
+    const fecha = fechaPeru();
+    const hora  = horaPeru();
     const active = await one(
       'SELECT id FROM asistencia WHERE usuario_id=$1 AND fecha=$2 AND hora_salida IS NULL ORDER BY id DESC LIMIT 1',
       [req.user.id, fecha]
@@ -354,7 +362,7 @@ app.post('/api/reimbursements', requireAuth, upload.array('archivos', 5), async 
     } = req.body;
     if (!monto) return res.status(400).json({ error: 'El monto es obligatorio' });
     const concepto = descripcion_nombre || descripcion_libre || tipo_gasto || 'Reembolso';
-    const fecha = new Date().toISOString().slice(0, 10);
+    const fecha = fechaPeru();
     const archivos = [];
     for (const file of (req.files || [])) {
       const ts   = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
